@@ -1,24 +1,5 @@
-import random
-import numpy as np
-
 import torch
 import torch.nn.functional as F
-import gluonnlp
-from gluonnlp.data import SentencepieceTokenizer
-from transformers import GPT2Config, GPT2LMHeadModel
-
-
-kogpt2_config = {
-    "initializer_range": 0.02,
-    "layer_norm_epsilon": 1e-05,
-    "n_ctx": 1024,
-    "n_embd": 768,
-    "n_head": 12,
-    "n_layer": 12,
-    "n_positions": 1024,
-    "vocab_size": 50000,
-    "activation_function": "gelu"
-}
 
 
 def top_k_logits(logits, k):
@@ -46,14 +27,17 @@ def top_p_logits(logits, top_p=0.0, filter_value=-float('Inf')):
     return logits
 
 
-def sample_sequence(model, vocab, tokenizer, device, text, length, temperature, top_p, top_k):
+def sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_p, top_k):
     tokenized = tokenizer(text)  # 받은 문장
 
     generated_text = ''
     generated_length = 0
 
+    if len(tokenized) > 1024:
+        tokenized = tokenized[len(tokenized) - 1000:]
+
     """ START: Customization for sampling is optional """
-    while True:
+    while generated_length <= 50:
         input = torch.tensor([vocab[vocab.bos_token], ] + vocab[tokenized]).unsqueeze(0)
         input = input.to(device)
 
@@ -77,7 +61,7 @@ def sample_sequence(model, vocab, tokenizer, device, text, length, temperature, 
 
         generated = vocab.to_tokens(prev.squeeze().tolist())
 
-        if generated == '</s>' or generated_length > length:
+        if generated == '</s>':
             text += generated.replace('▁', ' ')
             text += '\n'
             generated_text += generated.replace('▁', ' ')
@@ -91,40 +75,36 @@ def sample_sequence(model, vocab, tokenizer, device, text, length, temperature, 
         tokenized = tokenizer(text)
     """ END: Customization for sampling is optional """
 
-    return text.replace('</s>', '.')
+    return generated_text.replace('</s>', '.')
 
 
-def main(text, model='kogpt2', flag=False):
-    length = 250
-    temperature = 0.7
-    top_k = 40
-    top_p = 0.9
+def sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_p, top_k):
+    tokenized = tokenizer(text)  # 받은 문장
 
-    seed = random.randint(0, 2147483647)
-    np.random.seed(seed)
-    torch.random.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if len(tokenized) > 1024:
+        tokenized = tokenized[len(tokenized) - 1000:]
 
-    model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path=None,
-                                            config=GPT2Config.from_dict(kogpt2_config),
-                                            state_dict=torch.load('./models/kogpt2_model.params'))
+    input_ids = torch.tensor([vocab[vocab.bos_token], ] + vocab[tokenized]).unsqueeze(0)
+    input_ids = input_ids.to(device)
 
-    model.to(device)
-    model.eval()
+    predicts = model(input_ids)
+    pred = predicts[0]
 
-    vocab = gluonnlp.vocab.BERTVocab.from_sentencepiece('./models/kogpt2_vocab.spiece',
-                                                        mask_token='<msk>',
-                                                        sep_token='<sep>',
-                                                        cls_token='<cls>',
-                                                        unknown_token='<unk>',
-                                                        padding_token='<pad>',
-                                                        bos_token='<s>',
-                                                        eos_token='</s>')
+    # temperature applying
+    logits = pred
+    logits = logits[:, -1, :] / temperature
 
-    tokenizer = SentencepieceTokenizer('./models/kogpt2_tokenizer.spiece')
+    # top k sampling
+    logits = top_k_logits(logits, top_k)
 
-    sentence = sample_sequence(model, vocab, tokenizer, device, text, length, temperature, top_p, top_k)
-    sentence = sentence.replace("<unused0>", "\n")
+    # top p sampling
+    logits = top_p_logits(logits, top_p)
 
-    return {'content': sentence}
+    # probabilities
+    log_probs = F.softmax(logits, dim=-1)
+
+    prev = torch.multinomial(log_probs, num_samples=10)
+
+    generated_words = vocab.to_tokens(prev.squeeze().tolist())
+
+    return generated_words

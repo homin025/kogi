@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/kogi-gpt2.iml" filepath="$PROJECT_DIR$/.idea/kogi-gpt2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/kogi.iml" filepath="$PROJECT_DIR$/.idea/kogi.iml" />
     </modules>
   </component>
 </project>
