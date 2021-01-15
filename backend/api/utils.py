@@ -27,7 +27,7 @@ def top_p_logits(logits, top_p=0.0, filter_value=-float('Inf')):
     return logits
 
 
-def sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_p, top_k):
+def sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_k, top_p):
     tokenized = tokenizer(text)  # 받은 문장
 
     generated_text = ''
@@ -78,7 +78,7 @@ def sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature,
     return generated_text.replace('</s>', '.')
 
 
-def sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_p, top_k):
+def sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_k, top_p):
     tokenized = tokenizer(text)  # 받은 문장
 
     if len(tokenized) > 1024:

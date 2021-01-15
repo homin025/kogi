@@ -20,11 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6ec55a1f-cdf2-44d0-b2fc-aa89486e524c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/kogi-gpt2.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apis/tale_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/tale_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/question_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/question_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/review_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/review_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/tale_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/tale_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
     </list>
@@ -101,24 +101,25 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1876" height="259" key="GridCell.Tab.0.bottom" timestamp="1610613606305">
+    <state width="1465" height="241" key="GridCell.Tab.0.bottom" timestamp="1610698447086">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="259" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1610613606305" />
-    <state width="1876" height="259" key="GridCell.Tab.0.center" timestamp="1610613606305">
+    <state width="1465" height="241" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1610698447086" />
+    <state width="1465" height="241" key="GridCell.Tab.0.center" timestamp="1610698447086">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="259" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1610613606305" />
-    <state width="1876" height="259" key="GridCell.Tab.0.left" timestamp="1610613606305">
+    <state width="1465" height="241" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1610698447086" />
+    <state width="1465" height="241" key="GridCell.Tab.0.left" timestamp="1610698447086">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="259" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1610613606305" />
-    <state width="1876" height="259" key="GridCell.Tab.0.right" timestamp="1610613606305">
+    <state width="1465" height="241" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1610698447086" />
+    <state width="1465" height="241" key="GridCell.Tab.0.right" timestamp="1610698447086">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="259" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1610613606305" />
+    <state width="1465" height="241" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1610698447086" />
     <state x="351" y="156" key="SettingsEditor" timestamp="1610541567518">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -127,5 +128,16 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="539" y="5" width="840" height="1034" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1610541872935" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/backend/api/review_generation.py</url>
+          <line>18</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

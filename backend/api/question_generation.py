@@ -3,9 +3,7 @@ import numpy as np
 
 import torch
 from tokenizers import SentencePieceBPETokenizer
-from transformers import GPT2Config, GPT2LMHeadModel
-
-from backend.api.utils import sample_sequence_sentence, sample_sequence_words
+from transformers import GPT2LMHeadModel
 
 
 def main(content, keywords, model_name):
@@ -18,7 +16,7 @@ def main(content, keywords, model_name):
         "korquad": "./model/kogpt2_qg_korquad_30.ckpt"
     }
 
-    model_path = model_dict[model_name]
+    model_file = model_dict[model_name]
 
     seed = random.randint(0, 2147483647)
     np.random.seed(seed)
@@ -27,7 +25,7 @@ def main(content, keywords, model_name):
     device = "cpu"
 
     model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path="taeminlee/kogpt2",
-                                            state_dict=torch.load(model_path, map_location=device))
+                                            state_dict=torch.load(model_file, map_location=device))
 
     model.to(device)
     model.eval()
@@ -46,11 +44,12 @@ def main(content, keywords, model_name):
     answers_tokens = [tokenizer.encode(f"정답:{keyword}").ids for keyword in keywords]
 
     generated_questions = []
+    generated_answers = []
     for answer_tokens in answers_tokens:
         len_input_ids = 1 + len(context_tokens) + len(answer_tokens) + len(task_token) + 1
 
-        if len_input_ids >= 800:
-            len_available = 800 - len(answers_tokens) - len(task_token)
+        if len_input_ids >= 1000:
+            len_available = 1000 - len(answers_tokens) - len(task_token)
             context_tokens = context_tokens[:len_available]
 
         input_ids = [bos_token] + context_tokens + answer_tokens + task_token
@@ -70,6 +69,9 @@ def main(content, keywords, model_name):
             pad_token_id=0,
             bos_token_id=1,
             eos_token_id=2,
+            temperature=temperature,
+            top_k=top_k,
+            top_p=top_p,
             repetition_penalty=1.3,
             no_repeat_ngram_size=3,
             num_return_sequences=1,
@@ -78,8 +80,9 @@ def main(content, keywords, model_name):
         for output_tokens in output.tolist():
             keyword = tokenizer.decode(answer_tokens)
             keyword = keyword.split(":")[1]
+            generated_answers.append(keyword)
             sentence = tokenizer.decode(output_tokens[len_input_ids:])
             sentence = sentence.split("</s>")[0].replace("<s>", "")
-            generated_questions.append([keyword, sentence])
+            generated_questions.append(sentence)
 
-    return {"questions": generated_questions}
+    return {"questions": generated_questions, "answers": generated_answers}

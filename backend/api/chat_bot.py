@@ -22,7 +22,7 @@ kogpt2_config = {
 }
 
 
-def main(text, model_name, flag):
+def main(text, model_name):
     """ Independent variables """
     temperature = 0.7
     top_k = 40
@@ -34,7 +34,7 @@ def main(text, model_name, flag):
         "aesop_fables": "./model/kogpt2_tg_aesop_fables_20.ckpt"
     }
 
-    model_file = model_dict[model_name]
+    model_path = model_dict[model_name]
 
     seed = random.randint(0, 2147483647)
     np.random.seed(seed)
@@ -42,11 +42,9 @@ def main(text, model_name, flag):
     torch.cuda.manual_seed(seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    torch.cuda.empty_cache()
-
     model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path=None,
                                             config=GPT2Config.from_dict(kogpt2_config),
-                                            state_dict=torch.load(model_file, map_location=device))
+                                            state_dict=torch.load(model_path, map_location=device))
 
     model.to(device)
     model.eval()
@@ -64,10 +62,10 @@ def main(text, model_name, flag):
 
     # 문장진행 텍스트 return
     if flag:
-        sentence = sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_k, top_p)
+        sentence = sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_p, top_k)
         sentence = sentence.replace("<unused0>", "\n")
         return {'sentence': sentence}
     # 단어진행 리스트 return
     else:
-        words = sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_k, top_p)
+        words = sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_p, top_k)
         return {'words': words}

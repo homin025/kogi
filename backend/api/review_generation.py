@@ -33,7 +33,7 @@ def main(text, model_name, flag=False):
         "naver_movie": "./model/kogpt2_rg_naver_movie_20.ckpt"
     }
 
-    model_path = model_dict[model_name]
+    model_file = model_dict[model_name]
 
     seed = random.randint(0, 2147483647)
     np.random.seed(seed)
@@ -43,7 +43,7 @@ def main(text, model_name, flag=False):
 
     model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path=None,
                                             config=GPT2Config.from_dict(kogpt2_config),
-                                            state_dict=torch.load(model_path, map_location=device))
+                                            state_dict=torch.load(model_file, map_location=device))
 
     model.to(device)
     model.eval()
@@ -61,10 +61,10 @@ def main(text, model_name, flag=False):
 
     # 문장진행 텍스트 return
     if flag:
-        sentence = sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_p, top_k)
+        sentence = sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_k, top_p)
         sentence = sentence.replace("<unused0>", "\n")
         return {'sentence': sentence}
     # 단어진행 리스트 return
     else:
-        sentence = sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_p, top_k)
+        sentence = sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_k, top_p)
         return {'words': sentence}
