@@ -46,16 +46,17 @@ const styles = (theme) => ({
       width : 200
   }
 });
-const apiURL = "http://localhost:8080";
+
+const apiURL = "http://localhost:3080";
 
 function Content(props) {
   const { classes } = props;
-  let [text, settext] = useState('article을 입력해주세요');
+  let [Text, setText] = useState('기사를 입력해주세요');
   let [temperature, setTemp] = useState(1.0);
   let [top_p, setTopp] = useState(0.9);
   let [top_k, setTopk] = useState(10);
   const handleChange = (event) => {
-      settext(event.target.value);
+      setText(event.target.value);
   }
 function _post(Data) {
   const raw = JSON.stringify(Data);
@@ -63,42 +64,39 @@ function _post(Data) {
   const requestOptions = {
     method: 'POST',
     headers: {
-      'Content-Type' : 'application/json',
-      Accpet: 'application/json',
-      'Access-Control-Allow_Origin':'*'
-      },
-    body: raw
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+      }
   };
 
-  fetch("localhost:8000/api/user", requestOptions)
-    .then(response => settext('response'))
-    .then(result => settext('result'))
-    .catch(error => settext(error));
+  fetch("http://localhost:8888/test", requestOptions)
+    .then(response => response.json())
+    .then(json => setText(json['body']))
+    .catch(error => setText(error));
   }
 
 
   function refresh(){
-      settext('');
+      setText('');
   }
-  function tempslide(event, newValue){
+  function tempSlide(event, newValue){
         setTemp(newValue);
   }
-  function toppslide(event, newValue){
+  function toppSlide(event, newValue){
         setTopp(newValue);
   }
-  function topkslide(event, newValue){
+  function topkSlide(event, newValue){
         setTopk(newValue);
   }
   function handleClick(){
         const Data ={
             textID: "qGenerator",
-            content: text,
+            content: Text,
             temperature: temperature,
             top_p: top_p,
             top_k: top_k
         }
         _post(Data);
-
   }
 
   return (<div>
@@ -118,7 +116,7 @@ function _post(Data) {
                 multiline
                 rows={10}
                 placeholder = 'article 입력'
-                value = {text}
+                value = {Text}
                 onChange = {handleChange}
                 InputProps={{
                   disableUnderline: true,
@@ -176,9 +174,9 @@ function _post(Data) {
             min={0.5}
             max={2.0}
             valueLabelDisplay="auto"
-            onChange = {tempslide}
+            onChange = {tempSlide}
         />
-        <Typography id="temperature" gutterBottom>
+        <Typography id="top_p" gutterBottom>
             top_p : {top_p}
         </Typography>
         <Slider
@@ -188,11 +186,11 @@ function _post(Data) {
             step={0.05}
             marks
             min={0.5}
-            max={0.9}
+            max={1.0}
             valueLabelDisplay="auto"
-            onChange = {toppslide}
+            onChange = {toppSlide}
         />
-        <Typography id="temperature" gutterBottom>
+        <Typography id="top_k" gutterBottom>
             top_k : {top_k}
         </Typography>
         <Slider
@@ -202,9 +200,9 @@ function _post(Data) {
             step={5}
             marks
             min={5}
-            max={40}
+            max={100}
             valueLabelDisplay="auto"
-            onChange = {topkslide}
+            onChange = {topkSlide}
         />
     </Paper>
     </Grid>

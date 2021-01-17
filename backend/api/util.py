@@ -27,7 +27,7 @@ def top_p_logits(logits, top_p=0.0, filter_value=-float('Inf')):
     return logits
 
 
-def sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_k, top_p):
+def sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_k, top_p, sentence_length):
     tokenized = tokenizer(text)  # 받은 문장
 
     generated_text = ''
@@ -37,7 +37,7 @@ def sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature,
         tokenized = tokenized[len(tokenized) - 1000:]
 
     """ START: Customization for sampling is optional """
-    while generated_length <= 50:
+    while generated_length <= sentence_length:
         input = torch.tensor([vocab[vocab.bos_token], ] + vocab[tokenized]).unsqueeze(0)
         input = input.to(device)
 
@@ -78,7 +78,7 @@ def sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature,
     return generated_text.replace('</s>', '.')
 
 
-def sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_k, top_p):
+def sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_k, top_p, word_count):
     tokenized = tokenizer(text)  # 받은 문장
 
     if len(tokenized) > 1024:
@@ -103,7 +103,7 @@ def sample_sequence_words(model, vocab, tokenizer, device, text, temperature, to
     # probabilities
     log_probs = F.softmax(logits, dim=-1)
 
-    prev = torch.multinomial(log_probs, num_samples=10)
+    prev = torch.multinomial(log_probs, num_samples=word_count)
 
     generated_words = vocab.to_tokens(prev.squeeze().tolist())
 

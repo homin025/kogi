@@ -5,16 +5,13 @@ import torch
 from tokenizers import SentencePieceBPETokenizer
 from transformers import GPT2LMHeadModel
 
+from backend.api.config import QGConfig
 
-def main(content, keywords, model_name):
-    """ Independent variables """
-    temperature = 0.7
-    top_k = 40
-    top_p = 0.9
 
-    model_dict = {
-        "korquad": "./model/kogpt2_qg_korquad_30.ckpt"
-    }
+def main(content, model_name, temperature, top_k, top_p, keywords, sentence_length):
+    config = QGConfig()
+
+    model_dict = config.model_dict
 
     model_file = model_dict[model_name]
 
@@ -22,7 +19,7 @@ def main(content, keywords, model_name):
     np.random.seed(seed)
     torch.random.manual_seed(seed)
     torch.cuda.manual_seed(seed)
-    device = "cpu"
+    device = torch.device("cpu")
 
     model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path="taeminlee/kogpt2",
                                             state_dict=torch.load(model_file, map_location=device))
@@ -49,8 +46,8 @@ def main(content, keywords, model_name):
         len_input_ids = 1 + len(context_tokens) + len(answer_tokens) + len(task_token) + 1
 
         if len_input_ids >= 1000:
-            len_available = 1000 - len(answers_tokens) - len(task_token)
-            context_tokens = context_tokens[:len_available]
+            len_available = len_input_ids - 1000
+            context_tokens = context_tokens[len_available:]
 
         input_ids = [bos_token] + context_tokens + answer_tokens + task_token
         len_input_ids = len(input_ids)
@@ -64,8 +61,8 @@ def main(content, keywords, model_name):
         output = model.generate(
             input_ids=input_ids,
             attention_masks=attention_mask,
-            max_length=len_input_ids+50,
-            min_length=len_input_ids+5,
+            max_length=len_input_ids+sentence_length,
+            min_length=len_input_ids+1,
             pad_token_id=0,
             bos_token_id=1,
             eos_token_id=2,

@@ -21,12 +21,18 @@
   <component name="ChangeListManager">
     <list default="true" id="6ec55a1f-cdf2-44d0-b2fc-aa89486e524c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/article_summarization.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/article_summarization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/chat_bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/chat_bot.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/api/question_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/question_generation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/api/review_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/review_generation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/api/tale_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/tale_generation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/utils.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.eslintcache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/content.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/content.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/static/ic_logo.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,6 +56,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager">
@@ -104,22 +111,26 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1465" height="241" key="GridCell.Tab.0.bottom" timestamp="1610698447086">
+    <state x="670" y="341" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1610884695686">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1465" height="241" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1610698447086" />
-    <state width="1465" height="241" key="GridCell.Tab.0.center" timestamp="1610698447086">
+    <state x="670" y="341" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1920.1040@0.0.1920.1040" timestamp="1610884695686" />
+    <state width="1740" height="241" key="GridCell.Tab.0.bottom" timestamp="1610797135290">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1465" height="241" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1610698447086" />
-    <state width="1465" height="241" key="GridCell.Tab.0.left" timestamp="1610698447086">
+    <state width="1740" height="241" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1610797135290" />
+    <state width="1740" height="241" key="GridCell.Tab.0.center" timestamp="1610797135290">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1465" height="241" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1610698447086" />
-    <state width="1465" height="241" key="GridCell.Tab.0.right" timestamp="1610698447086">
+    <state width="1740" height="241" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1610797135290" />
+    <state width="1740" height="241" key="GridCell.Tab.0.left" timestamp="1610797135290">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1465" height="241" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1610698447086" />
+    <state width="1740" height="241" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1610797135290" />
+    <state width="1740" height="241" key="GridCell.Tab.0.right" timestamp="1610797135290">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1740" height="241" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1610797135290" />
     <state x="351" y="156" key="SettingsEditor" timestamp="1610541567518">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -128,16 +139,5 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="539" y="5" width="840" height="1034" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1610541872935" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/api/review_generation.py</url>
-          <line>18</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

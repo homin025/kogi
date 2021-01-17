@@ -6,7 +6,8 @@ import gluonnlp
 from gluonnlp.data import SentencepieceTokenizer
 from transformers import GPT2Config, GPT2LMHeadModel
 
-from backend.api.utils import sample_sequence_sentence, sample_sequence_words
+from backend.api.util import sample_sequence_sentence, sample_sequence_words
+from backend.api.config import TGConfig
 
 
 kogpt2_config = {
@@ -22,17 +23,10 @@ kogpt2_config = {
 }
 
 
-def main(text, model_name, flag):
-    """ Independent variables """
-    temperature = 0.7
-    top_k = 40
-    top_p = 0.9
+def main(content, model_name, temperature, top_k, top_p, flag, sentence_length, word_count):
+    config = TGConfig()
 
-    model_dict = {
-        "kogpt2": "./model/kogpt2_model.params",
-        "woongjin_books": "./model/kogpt2_tg_woongjin_books_70.ckpt",
-        "aesop_fables": "./model/kogpt2_tg_aesop_fables_20.ckpt"
-    }
+    model_dict = config.model_dict
 
     model_file = model_dict[model_name]
 
@@ -64,10 +58,10 @@ def main(text, model_name, flag):
 
     # 문장진행 텍스트 return
     if flag:
-        sentence = sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_k, top_p)
+        sentence = sample_sequence_sentence(model, vocab, tokenizer, device, content, temperature, top_k, top_p, sentence_length)
         sentence = sentence.replace("<unused0>", "\n")
         return {'sentence': sentence}
     # 단어진행 리스트 return
     else:
-        words = sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_k, top_p)
+        words = sample_sequence_words(model, vocab, tokenizer, device, content, temperature, top_k, top_p, word_count)
         return {'words': words}
