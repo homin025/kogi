@@ -6,8 +6,8 @@ import gluonnlp
 from gluonnlp.data import SentencepieceTokenizer
 from transformers import GPT2Config, GPT2LMHeadModel
 
-from backend.api.util import sample_sequence_sentence, sample_sequence_words
-from backend.api.config import TGConfig
+from .util import sample_sequence_sentence, sample_sequence_words
+from .config import TGConfig
 
 
 kogpt2_config = {

@@ -1,11 +1,14 @@
 from flask import Flask, Response, request, jsonify
+# from flask_cors import CORS
 
-from backend.api import question_generation, article_summarization, review_generation, tale_generation, chat_bot
+from api import question_generation, article_summarization, review_generation, tale_generation, chat_bot
+
 
 app = Flask(__name__)
+# cors = CORS(app, resource={r'/api/*': {'origin': '*'}})
 
 
-@app.route('/question-generation', methods=['POST'])
+@app.route('/api/question-generation', methods=['POST'])
 def question_generation_api():
     """ Question Generation API
     Input:
@@ -38,7 +41,7 @@ def question_generation_api():
     return jsonify(result)
 
 
-@app.route('/article-summarization', methods=['POST'])
+@app.route('/api/article-summarization', methods=['POST', 'OPTIONS'])
 def article_summarization_api():
     """ Article Summarization API
     Input:
@@ -52,25 +55,39 @@ def article_summarization_api():
         sentence_count(int): 출력 문장 수
 
     Output:
-        summaries(str): 생성된 요약 문장 리스트
+        summary(str): 생성된 요약 문장 리스트
     """
 
-    data = request.get_json()
+    response = Response()
 
-    content = data['content']
-    model = data['model']
-    temperature = float(data['temperature'])
-    top_k = int(data['top_k'])
-    top_p = float(data['top_p'])
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
 
-    sentence_length = data['sentence_length']
-    sentence_count = data['sentence_count']
+    elif request.method == 'POST':
+        response.headers.add("Access-Control-Allow-Origin", "*")
 
-    result = article_summarization.main(content, model, temperature, top_k, top_p, sentence_length, sentence_count)
-    return jsonify(result)
+        data = request.get_json()
+        print(data)
+
+        content = data['content']
+        model = data['model']
+        temperature = float(data['temperature'])
+        top_k = int(data['top_k'])
+        top_p = float(data['top_p'])
+
+        sentence_length = data['sentence_length']
+        sentence_count = data['sentence_count']
+
+        result = article_summarization.main(content, model, temperature, top_k, top_p, sentence_length, sentence_count)
+
+        response.set_data(json.dumps(result))
+
+    return response
 
 
-@app.route('/review-generation', methods=['POST'])
+@app.route('/api/review-generation', methods=['POST'])
 def review_generation_api():
     """ Review Generation API
     Input:
@@ -111,7 +128,7 @@ def review_generation_api():
     return jsonify(result)
 
 
-@app.route('/tale-generation', methods=['POST'])
+@app.route('/api/tale-generation', methods=['POST'])
 def tale_generation_api():
     """ Tale Generation API
     Input:
@@ -152,7 +169,7 @@ def tale_generation_api():
     return jsonify(result)
 
 
-@app.route('/chat-bot', methods=['POST'])
+@app.route('/api/chat-bot', methods=['POST'])
 def chat_bot_api():
     """ Chat Bot API
     Input:
@@ -181,8 +198,10 @@ def chat_bot_api():
 import json
 
 
-@app.route('/test', methods=['GET', 'POST', 'OPTIONS'])
+@app.route('/api/test', methods=['GET', 'POST', 'OPTIONS'])
 def test_api():
+    data = request.get_json()
+
     result = Response()
 
     result.headers.add('Access-Control-Allow-Origin', "*")

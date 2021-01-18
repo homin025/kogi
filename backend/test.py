@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 
-from backend.api import question_generation, article_summarization, review_generation, tale_generation, chat_bot
+from api import question_generation, article_summarization, review_generation, tale_generation, chat_bot
 
 app = Flask(__name__)
 

@@ -1,4 +1,4 @@
-from backend.api.config import CBConfig
+from .config import CBConfig
 
 
 def main(content, model_name, temperature, top_k, top_p):

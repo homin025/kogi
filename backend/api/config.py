@@ -1,3 +1,5 @@
+
+
 class Config:
     def __init__(self) -> None:
         self.model_dict: dict
@@ -15,7 +17,7 @@ class ASConfig(Config):
     def __init__(self) -> None:
         super().__init__()
         self.model_dict = {
-            "korean": "./model/kogpt2_as_korean_25.ckpt"
+            "korean": "./model/kogpt2_as_korean_50.ckpt"
         }
 
 

@@ -58,6 +58,7 @@ function Content(props) {
   const handleChange = (event) => {
       setText(event.target.value);
   }
+
 function _post(Data) {
   const raw = JSON.stringify(Data);
 
@@ -65,36 +66,44 @@ function _post(Data) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-      }
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': '*',
+      },
+    body: raw
   };
 
-  fetch("http://localhost:8888/test", requestOptions)
+  fetch("http://localhost:8888/api/article-summarization", requestOptions)
     .then(response => response.json())
-    .then(json => setText(json['body']))
+    .then(json => setText(json['summary']))
     .catch(error => setText(error));
   }
-
 
   function refresh(){
       setText('');
   }
+
   function tempSlide(event, newValue){
-        setTemp(newValue);
+       setTemp(newValue);
   }
+
   function toppSlide(event, newValue){
         setTopp(newValue);
   }
+
   function topkSlide(event, newValue){
         setTopk(newValue);
   }
+
   function handleClick(){
-        const Data ={
-            textID: "qGenerator",
+        const Data = {
+            textID: "QuestionGeneration",
             content: Text,
+            model: "korean",
             temperature: temperature,
             top_p: top_p,
-            top_k: top_k
+            top_k: top_k,
+            sentence_length: "10",
+            sentence_count: "3"
         }
         _post(Data);
   }

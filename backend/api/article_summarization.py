@@ -5,7 +5,7 @@ import torch
 from transformers import GPT2LMHeadModel
 from tokenizers import SentencePieceBPETokenizer
 
-from backend.api.config import ASConfig
+from .config import ASConfig
 
 
 def main(content, model_name, temperature, top_k, top_p, sentence_length, sentence_count):
@@ -22,7 +22,7 @@ def main(content, model_name, temperature, top_k, top_p, sentence_length, senten
     device = torch.device("cpu")
 
     model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path="taeminlee/kogpt2",
-                                            state_dict=torch.load(model_file, map_location=device)['model_state_dict'])
+                                            state_dict=torch.load(model_file, map_location=device))
 
     model.to(device)
     model.eval()

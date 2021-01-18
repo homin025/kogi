@@ -5,7 +5,7 @@ import torch
 from tokenizers import SentencePieceBPETokenizer
 from transformers import GPT2LMHeadModel
 
-from backend.api.config import QGConfig
+from .config import QGConfig
 
 
 def main(content, model_name, temperature, top_k, top_p, keywords, sentence_length):
