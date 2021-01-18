@@ -21,17 +21,8 @@
   <component name="ChangeListManager">
     <list default="true" id="6ec55a1f-cdf2-44d0-b2fc-aa89486e524c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/article_summarization.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/article_summarization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/chat_bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/chat_bot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/question_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/question_generation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/review_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/review_generation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/tale_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/tale_generation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.eslintcache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/debug.log" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/debug.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/content.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/content.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

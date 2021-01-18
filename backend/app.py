@@ -35,7 +35,7 @@ def question_generation_api():
     top_p = float(data['top_p'])
 
     keywords = data['keywords']
-    sentence_length = data['sentence_length']
+    sentence_length = int(data['sentence_length'])
 
     result = question_generation.main(content, model, temperature, top_k, top_p, keywords, sentence_length)
     return jsonify(result)
@@ -69,7 +69,6 @@ def article_summarization_api():
         response.headers.add("Access-Control-Allow-Origin", "*")
 
         data = request.get_json()
-        print(data)
 
         content = data['content']
         model = data['model']
