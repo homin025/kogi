@@ -8,7 +8,7 @@ app = Flask(__name__)
 # cors = CORS(app, resource={r'/api/*': {'origin': '*'}})
 
 
-@app.route('/api/question-generation', methods=['POST'])
+@app.route('/api/question-generation', methods=['POST', 'OPTIONS'])
 def question_generation_api():
     """ Question Generation API
     Input:
@@ -25,20 +25,32 @@ def question_generation_api():
         questions(list): 생성된 질문 리스트
         answers(list): 생선된 질문의 정답 리스트
     """
-    
-    data = request.get_json()
+    response = Response()
 
-    content = data['content']
-    model = data['model']
-    temperature = float(data['temperature'])
-    top_k = int(data['top_k'])
-    top_p = float(data['top_p'])
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
 
-    keywords = data['keywords']
-    sentence_length = int(data['sentence_length'])
+    elif request.method == 'POST':
+        response.headers.add("Access-Control-Allow-Origin", "*")
 
-    result = question_generation.main(content, model, temperature, top_k, top_p, keywords, sentence_length)
-    return jsonify(result)
+        data = request.get_json()
+
+        content = data['content']
+        model = data['model']
+        temperature = float(data['temperature'])
+        top_k = int(data['top_k'])
+        top_p = float(data['top_p'])
+
+        keywords = data['keywords']
+        sentence_length = int(data['sentence_length'])
+
+        result = question_generation.main(content, model, temperature, top_k, top_p, keywords, sentence_length)
+
+        response.set_data(json.dumps(result, ensure_ascii=False))
+
+    return response
 
 
 @app.route('/api/article-summarization', methods=['POST', 'OPTIONS'])
@@ -57,7 +69,6 @@ def article_summarization_api():
     Output:
         summary(str): 생성된 요약 문장 리스트
     """
-
     response = Response()
 
     if request.method == 'OPTIONS':
@@ -81,12 +92,12 @@ def article_summarization_api():
 
         result = article_summarization.main(content, model, temperature, top_k, top_p, sentence_length, sentence_count)
 
-        response.set_data(json.dumps(result))
+        response.set_data(json.dumps(result, ensure_ascii=False))
 
     return response
 
 
-@app.route('/api/review-generation', methods=['POST'])
+@app.route('/api/review-generation', methods=['POST', 'OPTIONS'])
 def review_generation_api():
     """ Review Generation API
     Input:
@@ -104,30 +115,42 @@ def review_generation_api():
         sentence(str): 생성된 문장
         words(list): 생성된 단어 리스트
     """
+    response = Response()
 
-    data = request.get_json()
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
 
-    content = data['content']
-    model = data['model']
-    temperature = float(data['temperature'])
-    top_k = int(data['top_k'])
-    top_p = float(data['top_p'])
+    elif request.method == 'POST':
+        response.headers.add("Access-Control-Allow-Origin", "*")
 
-    if data['flag'] == "True":
-        flag = True
-    else:
-        flag = False
+        data = request.get_json()
 
-    if flag:
-        sentence_length = int(data['length'])
-    else:
-        word_count = int(data['count'])
+        content = data['content']
+        model = data['model']
+        temperature = float(data['temperature'])
+        top_k = int(data['top_k'])
+        top_p = float(data['top_p'])
 
-    result = review_generation.main(content, model, temperature, top_k, top_p, flag, sentence_length, word_count)
-    return jsonify(result)
+        if data['flag'] == "True":
+            flag = True
+        else:
+            flag = False
+
+        if flag:
+            sentence_length = int(data['length'])
+        else:
+            word_count = int(data['count'])
+
+        result = review_generation.main(content, model, temperature, top_k, top_p, flag, sentence_length, word_count)
+
+        response.set_data(json.dumps(result, ensure_ascii=False))
+
+    return response
 
 
-@app.route('/api/tale-generation', methods=['POST'])
+@app.route('/api/tale-generation', methods=['POST', 'OPTIONS'])
 def tale_generation_api():
     """ Tale Generation API
     Input:
@@ -145,30 +168,42 @@ def tale_generation_api():
         sentence(str): 생성된 문장
         words(list): 생성된 단어 리스트
     """
+    response = Response()
 
-    data = request.get_json()
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
 
-    content = data['content']
-    model = data['model']
-    temperature = float(data['temperature'])
-    top_k = int(data['top_k'])
-    top_p = float(data['top_p'])
+    elif request.method == 'POST':
+        response.headers.add("Access-Control-Allow-Origin", "*")
 
-    if data['flag'] == "True":
-        flag = True
-    else:
-        flag = False
+        data = request.get_json()
 
-    if flag:
-        sentence_length = int(data['length'])
-    else:
-        word_count = int(data['count'])
+        content = data['content']
+        model = data['model']
+        temperature = float(data['temperature'])
+        top_k = int(data['top_k'])
+        top_p = float(data['top_p'])
 
-    result = tale_generation.main(content, model, temperature, top_k, top_p, flag, sentence_length, word_count)
-    return jsonify(result)
+        if data['flag'] == "True":
+            flag = True
+        else:
+            flag = False
+
+        if flag:
+            sentence_length = int(data['length'])
+        else:
+            word_count = int(data['count'])
+
+        result = tale_generation.main(content, model, temperature, top_k, top_p, flag, sentence_length, word_count)
+
+        response.set_data(json.dumps(result, ensure_ascii=False))
+
+    return response
 
 
-@app.route('/api/chat-bot', methods=['POST'])
+@app.route('/api/chat-bot', methods=['POST', 'OPTIONS'])
 def chat_bot_api():
     """ Chat Bot API
     Input:
@@ -181,17 +216,29 @@ def chat_bot_api():
     Output:
         sentence(str): 생성된 문장
     """
+    response = Response()
 
-    data = request.get_json()
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
 
-    content = data['content']
-    model = data['model']
-    temperature = float(data['temperature'])
-    top_k = int(data['top_k'])
-    top_p = float(data['top_p'])
+    elif request.method == 'POST':
+        response.headers.add("Access-Control-Allow-Origin", "*")
 
-    result = chat_bot.main(content, model, temperature, top_k, top_p)
-    return jsonify(result)
+        data = request.get_json()
+
+        content = data['content']
+        model = data['model']
+        temperature = float(data['temperature'])
+        top_k = int(data['top_k'])
+        top_p = float(data['top_p'])
+
+        result = chat_bot.main(content, model, temperature, top_k, top_p)
+
+        response.set_data(json.dumps(result, ensure_ascii=False))
+
+    return response
 
 
 import json
@@ -205,7 +252,7 @@ def test_api():
 
     result.headers.add('Access-Control-Allow-Origin', "*")
     result.headers.add('Access-Control-Allow-Headers', "*")
-    result.set_data(json.dumps({"body": "확인"}))
+    result.set_data(json.dumps({"body": "TEST"}))
 
     return result
 
