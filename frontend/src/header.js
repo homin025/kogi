@@ -16,6 +16,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import { useEffect } from 'react';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -41,9 +42,12 @@ const styles = (theme) => ({
   },
 });
 
+
+
 function Header(props) {
   const { classes, onDrawerToggle } = props;
-
+  let [title, setTitle] = React.useState(['질문생성','기사요약','리뷰생성','동화창작','챗봇모델']);
+  
   return (
     <React.Fragment>
       {/* <AppBar color="primary" position="sticky" elevation={0}>
@@ -93,7 +97,7 @@ function Header(props) {
           <Grid container alignItems="center" spacing={1}>
             <Grid item xs>
               <Typography color="inherit" variant="h5" component="h1">
-                질문생성
+                {title[props.index]}
               </Typography>
             </Grid>
             {/* <Grid item>
