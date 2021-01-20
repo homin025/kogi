@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -10,21 +9,17 @@ import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
-import SearchIcon from '@material-ui/icons/Search';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import Slider from '@material-ui/core/Slider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import Divider from '@material-ui/core/Divider';
 import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Select from '@material-ui/core/Select';
 import HelpIcon from '@material-ui/icons/Help';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import fetchIntercept from 'fetch-intercept';
-
+import FetchIntercept from 'fetch-intercept';
 
 const styles = (theme) => ({
   paperPrimary: {
@@ -70,10 +65,10 @@ const apiURL = "http://localhost:8888";
 function Article_summarization(props) {
   const { classes } = props;
   let [model, setModel] = useState('korean');
-  let [Text, setText] = useState('');
+  let [text, setText] = useState('');
   let [keyword, setKeyword] = useState([]);
   let [summaries, setSummaries] = useState('');
-  let [temperature, setTemp] = useState(1.0);
+  let [temperature, setTemperature] = useState(1.0);
   let [top_p, setTopp] = useState(0.9);
   let [top_k, setTopk] = useState(40);
   let [state, setState] = useState(false);
@@ -90,13 +85,15 @@ function Article_summarization(props) {
       },
       body: raw
     };
+
     fetch(`${apiURL}/api/article-summarization`, requestOptions)
       .then(response =>response.json())
       .then(json => setSummaries(json['summary']))
       .catch(error => setText(error));
       unregister();
   }
-  const unregister = fetchIntercept.register({
+  
+  const unregister = FetchIntercept.register({
     request: function (url, config) {
         setState(true);
         return [url, config];
@@ -116,17 +113,17 @@ function Article_summarization(props) {
       setState(false);
         return Promise.reject(error);
     }
-});
+  });
+
   function refresh() {
     setText('');
     setKeyword(['', '', ''])
   }
 
-
   function handleClick() {
     const Data = {
-      textID: "QuestionGeneration",
-      content: Text,
+      textID: "ArticleSummarization",
+      content: text,
       model: model,
       temperature: temperature,
       top_p: top_p,
@@ -146,10 +143,9 @@ function Article_summarization(props) {
   const handleChange = (event) => {
     setText(event.target.value);
   }
-  
 
   function tempSlide(event, newValue) {
-    setTemp(newValue);
+    setTemperature(newValue);
   }
 
   function toppSlide(event, newValue) {
@@ -163,38 +159,40 @@ function Article_summarization(props) {
   return (
     <div>
       <Toolbar>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel shrink htmlFor="model selection">
             모델
           </InputLabel>
-          <NativeSelect
+          <Select
+            native
             onChange={handleModel}
+            label="Model"
             inputProps={{
-            name: 'models',
-            id: 'model selection',
+              name: 'models',
+              id: 'model selection',
             }}>
             <option value="korean">국립국어원 말뭉치</option>
-          </NativeSelect>
-          {/* <FormHelperText>Label + placeholder</FormHelperText> */}
+          </Select>
         </FormControl>
-        <span>&nbsp;&nbsp;&nbsp;</span>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel shrink htmlFor="example selection">
             예시
           </InputLabel>
-          <NativeSelect
+          <Select
+            native
+            label="Example"
             inputProps={{
               name: 'examples',
               id: 'example selection',
             }}>
             <option value="">None</option>
-          </NativeSelect>
-          {/* <FormHelperText>Label + placeholder</FormHelperText> */}
+          </Select>
         </FormControl>
+        <span>&nbsp;&nbsp;&nbsp;</span>
       </Toolbar>
+      <p></p>
       <Grid container spacing={2}  alignItems="center">
         <Grid item xs={8}>
-
           <p></p>
           <InputLabel shrink htmlFor="context input">
             본문
@@ -208,7 +206,7 @@ function Article_summarization(props) {
                     multiline
                     rows={10}
                     placeholder='본문을 입력해주세요.'
-                    value={Text}
+                    value={text}
                     onChange={handleChange}
                     InputProps={{
                       disableUnderline: true,
@@ -234,32 +232,34 @@ function Article_summarization(props) {
             결과
           </InputLabel>
           <Paper className={classes.paperPrimary}>
-            <div className={classes.contentWrapper}>
-                <Grid container spacing={2}  alignItems="center">
-                    <Typography color="textSecondary" align="center" display = 'block'>
-                      {summaries}
-                    </Typography>
-                </Grid>
-            </div>
+            <Toolbar>
+              <div className={classes.contentWrapper}>
+                  <Grid container spacing={2}  alignItems="center">
+                      <Typography color="textSecondary" align="center" display = 'block'>
+                        {summaries}
+                      </Typography>
+                  </Grid>
+              </div>
+            </Toolbar>
           </Paper>
         </Grid>
 
         <Grid item xs>
           <Paper className={classes.paperSecondary} align ='center'>
-                <Toolbar alignItems="center">
-                    <Grid item xs = {11}>
-                        <Typography id="temperature" gutterBottom>
-                            temperature : {temperature} 
-                        </Typography> 
-                    </Grid>
-                    <Grid item xs = {1}>
-                        <Tooltip title="생성되는 글의 창의성을 조절하는 값입니다.">
-                            <IconButton size = 'small' color="inherit">
-                                <HelpIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Toolbar>
+            <Toolbar alignItems="center">
+              <Grid item xs = {11}>
+                <Typography id="temperature" gutterBottom>
+                    Temperature = {temperature} 
+                </Typography> 
+              </Grid>
+              <Grid item xs = {1}>
+                <Tooltip title={<h2>생성되는 글의 창의성을 조절합니다</h2>}>
+                  <IconButton size = 'small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
               defaultValue={1.0}
@@ -272,20 +272,19 @@ function Article_summarization(props) {
               onChange = {tempSlide}
             />
             <Toolbar alignItems="center">
-                    <Grid item xs = {11}>
-                    <Typography id="top_p" gutterBottom>
-                    top_p : {top_p}
-                    </Typography> 
-                    </Grid>
-                    <Grid item xs = {1}>
-                        <Tooltip title="샘플링된 단어 중 top_p 확률 이상의 단어만 선택합니다.">
-                            <IconButton size = 'small' color="inherit">
-                                <HelpIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Toolbar>
-            
+              <Grid item xs = {11}>
+                <Typography id="top_p" gutterBottom>
+                  Top P = {top_p}
+                </Typography> 
+              </Grid>
+              <Grid item xs = {1}>
+                <Tooltip title={<h2>샘플링될 단어의 누적분포 합이 P보다 크지 않도록 제한합니다</h2>}>
+                  <IconButton size = 'small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
               defaultValue={0.9}
@@ -298,19 +297,19 @@ function Article_summarization(props) {
               onChange = {toppSlide}
             />
             <Toolbar alignItems="center">
-                    <Grid item xs = {11}>
-                    <Typography id="top_k" gutterBottom>
-                      top_k : {top_k}
-                    </Typography> 
-                    </Grid>
-                    <Grid item xs = {1}>
-                        <Tooltip title="샘플링된 단어 중 상위 k개의 단어만 선택합니다.">
-                            <IconButton size = 'small' color="inherit">
-                                <HelpIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Toolbar>
+              <Grid item xs = {11}>
+                <Typography id="top_k" gutterBottom>
+                  Top K = {top_k}
+                </Typography> 
+              </Grid>
+              <Grid item xs = {1}>
+                <Tooltip title={<h2>샘플링될 단어의 갯수를 K개로 제한합니다</h2>}>
+                  <IconButton size = 'small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
               defaultValue={10}

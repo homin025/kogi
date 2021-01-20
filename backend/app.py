@@ -7,7 +7,7 @@ from transformers import GPT2LMHeadModel
 from flask import Flask, Response, request, jsonify
 # from flask_cors import CORS
 
-from .api import question_generation, article_summarization, review_generation, tale_generation, chat_bot, config
+from api import question_generation, article_summarization, review_generation, tale_generation, chat_bot, config
 
 app = Flask(__name__)
 # cors = CORS(app, resource={r'/api/*': {'origin': '*'}})

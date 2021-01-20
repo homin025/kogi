@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -10,20 +9,22 @@ import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
-import SearchIcon from '@material-ui/icons/Search';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import Slider from '@material-ui/core/Slider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
 import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Select from '@material-ui/core/Select';
 import HelpIcon from '@material-ui/icons/Help';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import fetchIntercept from 'fetch-intercept';
+import FetchIntercept from 'fetch-intercept';
+
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
 const styles = (theme) => ({
   paperPrimary: {
@@ -69,35 +70,15 @@ const apiURL = "http://localhost:8888";
 function Question_generation(props) {
   const { classes } = props;
   let [model, setModel] = useState('korquad');
-  let [Text, setText] = useState('');
+  let [text, setText] = useState('');
   let [keyword, setKeyword] = useState([]);
   let [question, setQuestion] = useState([]);
   let [answer, setAnswer] = useState([]);
-  let [temperature, setTemp] = useState(1.0);
+  let [temperature, setTemperature] = useState(1.0);
   let [top_p, setTopp] = useState(0.9);
   let [top_k, setTopk] = useState(40);
   let [state, setState] = useState(false);
-  const unregister = fetchIntercept.register({
-    request: function (url, config) {
-        setState(true);
-        return [url, config];
-    },
 
-    requestError: function (error) {
-      setState(false);
-        return Promise.reject(error);
-    },
-
-    response: function (response) {
-      setState(false);
-        return response;
-    },
-
-    responseError: function (error) {
-      setState(false);
-        return Promise.reject(error);
-    }
-});
   function _post(Data) {
     const raw = JSON.stringify(Data);
 
@@ -118,33 +99,37 @@ function Question_generation(props) {
       unregister();
   }
 
+  const unregister = FetchIntercept.register({
+    request: function (url, config) {
+        setState(true);
+        return [url, config];
+    },
+
+    requestError: function (error) {
+      setState(false);
+        return Promise.reject(error);
+    },
+
+    response: function (response) {
+      setState(false);
+        return response;
+    },
+
+    responseError: function (error) {
+      setState(false);
+        return Promise.reject(error);
+    }
+  });
+
   function refresh() {
     setText('');
     setKeyword(['', '', ''])
   }
 
-  function outputList() {
-    const questions = props.question
-    const answers = props.answer
-
-    return (
-      <ul>
-        {questions.map((question) =>
-          <ListItem key={question.toString()} value={question} />
-        )}
-        {answers.map((answer) =>
-          <ListItem key={answer.toString()} value={answer} />
-        )}
-      </ul>
-    )
-
-  }
-
-
   function handleClick() {
     const Data = {
       textID: "QuestionGeneration",
-      content: Text,
+      content: text,
       model: model,
       temperature: temperature,
       top_p: top_p,
@@ -171,7 +156,7 @@ function Question_generation(props) {
   }
 
   function tempSlide(event, newValue) {
-    setTemp(newValue);
+    setTemperature(newValue);
   }
 
   function toppSlide(event, newValue) {
@@ -185,35 +170,38 @@ function Question_generation(props) {
   return (
     <div>
       <Toolbar>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel shrink htmlFor="model selection">
             모델
           </InputLabel>
-          <NativeSelect
+          <Select
+            native
             onChange={handleModel}
+            label="Model"
             inputProps={{
-            name: 'models',
-            id: 'model selection',
+              name: 'models',
+              id: 'model selection',
             }}>
             <option value="korquad">Korquad v1.0</option>
-          </NativeSelect>
-          {/* <FormHelperText>Label + placeholder</FormHelperText> */}
+          </Select>
         </FormControl>
-        <span>&nbsp;&nbsp;&nbsp;</span>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel shrink htmlFor="example selection">
             예시
           </InputLabel>
-          <NativeSelect
+          <Select
+            native
+            label="Example"
             inputProps={{
               name: 'examples',
               id: 'example selection',
             }}>
             <option value="">None</option>
-          </NativeSelect>
-          {/* <FormHelperText>Label + placeholder</FormHelperText> */}
+          </Select>
         </FormControl>
+        <span>&nbsp;&nbsp;&nbsp;</span>
       </Toolbar>
+      <p></p>
       <Grid container spacing={2}  alignItems="center">
         <Grid item xs={8}>
           <InputLabel shrink htmlFor="keyword input">
@@ -222,15 +210,17 @@ function Question_generation(props) {
           <Paper className={classes.paperPrimary}>
             <Toolbar>
               <Grid container spacing={2}  alignItems="center">
-                <TextField
-                  fullWidth
-                  placeholder = '키워드를 반점으로 나누어 입력해주세요. 예: 사과, 바나나, 오렌지'
-                  onChange = {handleKeyword}
-                  InputProps={{
-                    disableUnderline: true,
-                    className: classes.searchInput,
-                  }}
-                />
+                <Grid item xs>
+                  <TextField
+                    fullWidth
+                    placeholder='키워드를 반점으로 나누어 입력해주세요.'
+                    onChange={handleKeyword}
+                    InputProps={{
+                      disableUnderline: true,
+                      className: classes.searchInput,
+                    }}
+                  />
+                </Grid>
               </Grid>
             </Toolbar>
           </Paper>
@@ -246,8 +236,8 @@ function Question_generation(props) {
                     fullWidth
                     multiline
                     rows={10}
-                    placeholder='본문을 입력해주세요. 예: 사과는 맛있다. 맛있으면 바나나.'
-                    value={Text}
+                    placeholder='본문을 입력해주세요.'
+                    value={text}
                     onChange={handleChange}
                     InputProps={{
                       disableUnderline: true,
@@ -272,66 +262,44 @@ function Question_generation(props) {
           <InputLabel shrink htmlFor="generation output">
             결과
           </InputLabel>
-          <Paper>
-            <div className={classes.contentWrapper}>
+          <Paper className={classes.paperPrimary}>
+            <Toolbar>
               <List>
-                <Grid container spacing={2}  alignItems="center">
-                  <Grid item xs={8}>
-                    <Typography color="textSecondary" align="center">
-                      {question[0]}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography color="textSecondary" align="center">
-                      {answer[0]}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2}  alignItems="center">
-                  <Grid item xs={8}>
-                    <Typography color="textSecondary" align="center">
-                      {question[1]}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography color="textSecondary" align="center">
-                      {answer[1]}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2}  alignItems="center">
-                  <Grid item xs={8}>
-                    <Typography color="textSecondary" align="center">
-                      {question[2]}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography color="textSecondary" align="center">
-                      {answer[2]}
-                    </Typography>
-                  </Grid>
-                </Grid>
+                {question.map((item, index) => (
+                  <ListItem alignItems="flex-start">
+                    <ListItemIcon>
+                      <ArrowForwardIosIcon />
+                    </ListItemIcon>
+                    <ListItemText>
+                      질문: {question[index]}
+                    </ListItemText>
+                    <Divider variant="inset" component="li" />
+                    <ListItemText>
+                      정답: {answer[index]}
+                    </ListItemText>
+                  </ListItem>
+                ))}
               </List>
-            </div>
+            </Toolbar>
           </Paper>
         </Grid>
-
+        
         <Grid item xs>
           <Paper className={classes.paperSecondary} align ='center'>
-                <Toolbar alignItems="center">
-                    <Grid item xs = {11}>
-                        <Typography id="temperature" gutterBottom>
-                            temperature : {temperature} 
-                        </Typography> 
-                    </Grid>
-                    <Grid item xs = {1}>
-                        <Tooltip title="생성되는 글의 창의성을 조절하는 값입니다.">
-                            <IconButton size = 'small' color="inherit">
-                                <HelpIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Toolbar>
+            <Toolbar alignItems="center">
+              <Grid item xs = {11}>
+                <Typography id="temperature" gutterBottom>
+                    Temperature = {temperature} 
+                </Typography> 
+              </Grid>
+              <Grid item xs = {1}>
+                <Tooltip title={<h2>생성되는 글의 창의성을 조절합니다</h2>}>
+                  <IconButton size = 'small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
               defaultValue={1.0}
@@ -344,20 +312,19 @@ function Question_generation(props) {
               onChange = {tempSlide}
             />
             <Toolbar alignItems="center">
-                    <Grid item xs = {11}>
-                    <Typography id="top_p" gutterBottom>
-                    top_p : {top_p}
-                    </Typography> 
-                    </Grid>
-                    <Grid item xs = {1}>
-                        <Tooltip title="샘플링된 단어 중 top_p 확률 이상의 단어만 선택합니다.">
-                            <IconButton size = 'small' color="inherit">
-                                <HelpIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Toolbar>
-            
+              <Grid item xs = {11}>
+                <Typography id="top_p" gutterBottom>
+                  Top P = {top_p}
+                </Typography> 
+              </Grid>
+              <Grid item xs = {1}>
+                <Tooltip title={<h2>샘플링될 단어의 누적분포 합이 P보다 크지 않도록 제한합니다</h2>}>
+                  <IconButton size = 'small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
               defaultValue={0.9}
@@ -370,19 +337,19 @@ function Question_generation(props) {
               onChange = {toppSlide}
             />
             <Toolbar alignItems="center">
-                    <Grid item xs = {11}>
-                    <Typography id="top_k" gutterBottom>
-                      top_k : {top_k}
-                    </Typography> 
-                    </Grid>
-                    <Grid item xs = {1}>
-                        <Tooltip title="샘플링된 단어 중 상위 k개의 단어만 선택합니다.">
-                            <IconButton size = 'small' color="inherit">
-                                <HelpIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Toolbar>
+              <Grid item xs = {11}>
+                <Typography id="top_k" gutterBottom>
+                  Top K = {top_k}
+                </Typography> 
+              </Grid>
+              <Grid item xs = {1}>
+                <Tooltip title={<h2>샘플링될 단어의 갯수를 K개로 제한합니다</h2>}>
+                  <IconButton size = 'small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
               defaultValue={10}
