@@ -2,36 +2,18 @@ import random
 import numpy as np
 
 import torch
-from transformers import GPT2LMHeadModel
-from tokenizers import SentencePieceBPETokenizer
-
-from .config import ASConfig
 
 
-def main(content, model_name, temperature, top_k, top_p, sentence_length, sentence_count):
-    config = ASConfig()
-
-    model_dict = config.model_dict
-
-    model_file = model_dict[model_name]
-
+def main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, sentence_length, sentence_count):
     seed = random.randint(0, 2147483647)
     np.random.seed(seed)
     torch.random.manual_seed(seed)
     torch.cuda.manual_seed(seed)
-    device = torch.device("cpu")
 
-    model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path="taeminlee/kogpt2",
-                                            state_dict=torch.load(model_file, map_location=device))
+    model.load_state_dict(torch.load(model_file, map_location=device))
 
     model.to(device)
     model.eval()
-
-    tokenizer = SentencePieceBPETokenizer.from_file(
-        vocab_filename='./model/kogpt2_vocab.json',
-        merges_filename='./model/kogpt2_merges.txt',
-        add_prefix_space=False
-    )
 
     bos_token = tokenizer.token_to_id("<s>")
     eos_token = tokenizer.token_to_id("</s>")
@@ -47,8 +29,8 @@ def main(content, model_name, temperature, top_k, top_p, sentence_length, senten
 
     input_ids = [bos_token] + context_tokens + task_token
     len_input_ids = len(input_ids)
-    input_ids = torch.LongTensor([input_ids])
-    attention_mask = torch.LongTensor([[1.0] * len_input_ids])
+    input_ids = torch.tensor([input_ids]).cuda()
+    attention_mask = torch.tensor([[1.0] * len_input_ids]).cuda()
 
     model.to(device)
     input_ids.to(device)

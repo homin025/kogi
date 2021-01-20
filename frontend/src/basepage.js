@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { createMuiTheme, ThemeProvider, withStyles } from '@material-ui/core/styles';
+import {createMuiTheme, ThemeProvider, withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import Question_generation from './question_generation';
-import Article_summary from './article_summary';
+import Tale_generation from './tale_generation';
+import Review_generation from './review_generation';
+import Article_summarization from './article_summarization';
+import Chat_bot from './chat_bot'
 import Header from './header';
 import clsx from 'clsx';
 import Divider from '@material-ui/core/Divider';
@@ -15,25 +18,14 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import PeopleIcon from '@material-ui/icons/People';
-import DnsRoundedIcon from '@material-ui/icons/DnsRounded';
-import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
-import PublicIcon from '@material-ui/icons/Public';
-import SettingsEthernetIcon from '@material-ui/icons/SettingsEthernet';
 import kogi from './kogi.png';
-import Grid from '@material-ui/core/Grid';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import Grid from '@material-ui/core/Grid';
+import ContactSupportSharpIcon from '@material-ui/icons/ContactSupportSharp';
+import QuestionAnswerSharpIcon from '@material-ui/icons/QuestionAnswerSharp';
+import AssignmentSharpIcon from '@material-ui/icons/AssignmentSharp';
+import MenuBookSharpIcon from '@material-ui/icons/MenuBookSharp';
+import EditLocationSharpIcon from '@material-ui/icons/EditLocationSharp';
 
 let theme = createMuiTheme({
   palette: {
@@ -107,11 +99,6 @@ theme = {
         },
       },
     },
-    MuiToolbar: {
-      root: {
-        margin: theme.spacing(1)
-      }
-    },
     MuiIconButton: {
       root: {
         padding: theme.spacing(1),
@@ -154,7 +141,9 @@ theme = {
 const drawerWidth = 170;
 
 const styles = {
+  
   root: {
+
     display: 'flex',
     minHeight: '100vh',
   },
@@ -165,56 +154,61 @@ const styles = {
     },
   },
   app: {
+
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
   },
   main: {
     flex: 1,
-    padding: theme.spacing(1, 3),
+    padding: theme.spacing(3, 2),
     background: '#eaeff1',
   },
   footer: {
     padding: theme.spacing(2),
     background: '#eaeff1',
   },
-  firebase: {
-    fontSize: 24,
-    color: theme.palette.common.white,
+
+////////////
+firebase: {
+  fontSize: 24,
+  color: theme.palette.common.white,
+},
+categoryHeader: {
+  paddingTop: theme.spacing(2),
+  paddingBottom: theme.spacing(2),
+},
+categoryHeaderPrimary: {
+  color: theme.palette.common.white,
+},
+item: {
+  paddingTop: 1,
+  paddingBottom: 1,
+  color: 'rgba(255, 255, 255, 0.7)',
+  '&:hover,&:focus': {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
-  categoryHeader: {
-    paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(2),
-  },
-  categoryHeaderPrimary: {
-    color: theme.palette.common.white,
-  },
-  item: {
-    paddingTop: 1,
-    paddingBottom: 1,
-    color: 'rgba(255, 255, 255, 0.7)', '&:hover,&:focus': {
-      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    },
-  },
-  itemCategory: {
-    backgroundColor: '#232f3e',
-    boxShadow: '0 -1px 0 #404854 inset',
-    paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(2),
-  },
-  itemActiveItem: {
-    color: '#4fc3f7',
-  },
-  itemPrimary: {
-    fontSize: 'inherit',
-  },
-  itemIcon: {
-    minWidth: 'auto',
-    marginRight: theme.spacing(2),
-  },
-  divider: {
-    marginTop: theme.spacing(2),
-  },
+},
+itemCategory: {
+  backgroundColor: '#232f3e',
+  boxShadow: '0 -1px 0 #404854 inset',
+  paddingTop: theme.spacing(2),
+  paddingBottom: theme.spacing(2),
+},
+
+itemActiveItem: {
+  color: '#4fc3f7',
+},
+itemPrimary: {
+  fontSize: 'inherit',
+},
+itemIcon: {
+  minWidth: 'auto',
+  marginRight: theme.spacing(2),
+},
+divider: {
+  marginTop: theme.spacing(2),
+},
 };
 
 function Paperbase(props) {
@@ -224,14 +218,13 @@ function Paperbase(props) {
     {
       id: '기능',
       children: [
-        { id: '질문생성', icon: <PeopleIcon/>, active: butt[0], bvalue : 0},
-        { id: '기사요약', icon: <DnsRoundedIcon /> , active: butt[1], bvalue : 1},
-        { id: '리뷰생성', icon: <PermMediaOutlinedIcon />, active: butt[2], bvalue : 2 },
-        { id: '동화창작', icon: <PublicIcon /> , active: butt[3], bvalue : 3},
-        { id: '챗봇모델', icon: <SettingsEthernetIcon /> , active: butt[4], bvalue : 4},
+        { id: '질문생성', icon: <ContactSupportSharpIcon/>, active: butt[0], bvalue : 0},
+        { id: '기사요약', icon: <AssignmentSharpIcon/> , active: butt[1], bvalue : 1},
+        { id: '동화창작', icon: <MenuBookSharpIcon/>, active: butt[2], bvalue : 2 },
+        { id: '리뷰생성', icon: <EditLocationSharpIcon/> , active: butt[3], bvalue : 3},
+        { id: '챗봇모델', icon: <QuestionAnswerSharpIcon /> , active: butt[4], bvalue : 4},
       ],
     },
-  
   ];
   
   const { classes } = props;
@@ -245,19 +238,23 @@ function Paperbase(props) {
     var temp =[false, false, false, false, false];
     temp[index] = true;
     setButt(temp);
-
   };
   const [content, setContent] = React.useState(0);
-
-  function Content() {
+  function con(){
     if(content === 0) return <Question_generation/>;
-    else return <Article_summary/>
+    else if(content ===1){return <Article_summarization/>}
+    else if(content ===2){return <Tale_generation/>}
+    else if(content ===3){return <Review_generation/>}
+    else if(content ===4){return <Chat_bot/>}
+    
   }
   
   return (
     <ThemeProvider theme={theme}>
       <div className={classes.root}>
-        <CssBaseline /> 
+        <CssBaseline />
+        {/* <Grid container spacing={2}  alignItems="center">
+        <Grid item xs={2}> */}
         <nav className={classes.drawer}>
         
           <Hidden xsDown implementation="css">
@@ -295,7 +292,6 @@ function Paperbase(props) {
                 </ListItemText>
               </ListItem>
             ))}
-
             <Divider className={classes.divider} />
           </React.Fragment>
         ))}
@@ -308,10 +304,9 @@ function Paperbase(props) {
         <div className={classes.app}>
           <Header index = {content} onDrawerToggle={handleDrawerToggle} />
           <main className={classes.main}>
-            {Content()}
+            {con()}
           </main>
           <footer className={classes.footer}>
-             <Copyright /> 
           </footer>
         </div>
         

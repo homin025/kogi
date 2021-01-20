@@ -1,9 +1,4 @@
-from .config import CBConfig
 
 
-def main(content, model_name, temperature, top_k, top_p):
-    config = CBConfig()
-
-    model_dict = config.model_dict
-
+def main(content, model, tokenizer, device, model_file, temperature, top_k, top_p):
     return

@@ -21,9 +21,23 @@
   <component name="ChangeListManager">
     <list default="true" id="6ec55a1f-cdf2-44d0-b2fc-aa89486e524c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/article_summarization.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/article_summarization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/chat_bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/chat_bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/question_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/question_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/review_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/review_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/tale_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/tale_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/util.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.eslintcache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/content.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/content.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/debug.log" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/debug.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/basepage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/basepage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/header.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/question_generation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/question_generation.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +64,7 @@
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.test">
     <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="kogi" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -72,8 +86,30 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="kogi" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.app" />
       </list>
     </recent_temporary>
@@ -106,22 +142,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="670" y="341" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1920.1040@0.0.1920.1040" timestamp="1610884695686" />
-    <state width="1884" height="261" key="GridCell.Tab.0.bottom" timestamp="1610957584002">
+    <state width="1893" height="261" key="GridCell.Tab.0.bottom" timestamp="1611149334304">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1884" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1610957584002" />
-    <state width="1884" height="261" key="GridCell.Tab.0.center" timestamp="1610957584002">
+    <state width="1893" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1611149334304" />
+    <state width="1893" height="261" key="GridCell.Tab.0.center" timestamp="1611149334304">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1884" height="261" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1610957584002" />
-    <state width="1884" height="261" key="GridCell.Tab.0.left" timestamp="1610957584002">
+    <state width="1893" height="261" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1611149334304" />
+    <state width="1893" height="261" key="GridCell.Tab.0.left" timestamp="1611149334304">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1884" height="261" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1610957584002" />
-    <state width="1884" height="261" key="GridCell.Tab.0.right" timestamp="1610957584002">
+    <state width="1893" height="261" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1611149334304" />
+    <state width="1893" height="261" key="GridCell.Tab.0.right" timestamp="1611149334304">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1884" height="261" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1610957584002" />
+    <state width="1893" height="261" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1611149334304" />
     <state x="351" y="156" key="SettingsEditor" timestamp="1610541567518">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

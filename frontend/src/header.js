@@ -16,7 +16,11 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import { useEffect } from 'react';
+import ContactSupportSharpIcon from '@material-ui/icons/ContactSupportSharp';
+import QuestionAnswerSharpIcon from '@material-ui/icons/QuestionAnswerSharp';
+import AssignmentSharpIcon from '@material-ui/icons/AssignmentSharp';
+import MenuBookSharpIcon from '@material-ui/icons/MenuBookSharp';
+import EditLocationSharpIcon from '@material-ui/icons/EditLocationSharp';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -46,7 +50,8 @@ const styles = (theme) => ({
 
 function Header(props) {
   const { classes, onDrawerToggle } = props;
-  let [title, setTitle] = React.useState(['질문생성','기사요약','리뷰생성','동화창작','챗봇모델']);
+  let [icons, setIcon] = React.useState([<ContactSupportSharpIcon/>,<AssignmentSharpIcon/>,<MenuBookSharpIcon/>,<EditLocationSharpIcon/>,<QuestionAnswerSharpIcon/>]);
+  let [title, setTitle] = React.useState(['질문생성','기사요약','동화창작','리뷰생성','챗봇모델']);
   
   return (
     <React.Fragment>
@@ -97,7 +102,7 @@ function Header(props) {
           <Grid container alignItems="center" spacing={1}>
             <Grid item xs>
               <Typography color="inherit" variant="h5" component="h1">
-                {title[props.index]}
+                {icons[props.index]} {title[props.index]}
               </Typography>
             </Grid>
             {/* <Grid item>
@@ -105,13 +110,7 @@ function Header(props) {
                 Web setup
               </Button>
             </Grid> */}
-            <Grid item>
-              <Tooltip title="Help">
-                <IconButton color="inherit">
-                  <HelpIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid>
+            
           </Grid>
         </Toolbar>
       </AppBar>

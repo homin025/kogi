@@ -25,6 +25,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import fetchIntercept from 'fetch-intercept';
 
+
 const styles = (theme) => ({
   paperPrimary: {
     maxWidth: 3000,
@@ -66,17 +67,35 @@ const styles = (theme) => ({
 
 const apiURL = "http://localhost:8888";
 
-function Question_generation(props) {
+function Article_summarization(props) {
   const { classes } = props;
-  let [model, setModel] = useState('korquad');
+  let [model, setModel] = useState('korean');
   let [Text, setText] = useState('');
   let [keyword, setKeyword] = useState([]);
-  let [question, setQuestion] = useState([]);
-  let [answer, setAnswer] = useState([]);
+  let [summaries, setSummaries] = useState('');
   let [temperature, setTemp] = useState(1.0);
   let [top_p, setTopp] = useState(0.9);
   let [top_k, setTopk] = useState(40);
   let [state, setState] = useState(false);
+  
+  function _post(Data) {
+    const raw = JSON.stringify(Data);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': '*',
+      },
+      body: raw
+    };
+    fetch(`${apiURL}/api/article-summarization`, requestOptions)
+      .then(response =>response.json())
+      .then(json => setSummaries(json['summary']))
+      .catch(error => setText(error));
+      unregister();
+  }
   const unregister = fetchIntercept.register({
     request: function (url, config) {
         setState(true);
@@ -98,46 +117,9 @@ function Question_generation(props) {
         return Promise.reject(error);
     }
 });
-  function _post(Data) {
-    const raw = JSON.stringify(Data);
-
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': '*',
-      },
-      body: raw
-    };
-
-    fetch(`${apiURL}/api/question-generation`, requestOptions)
-      .then(response => response.json())
-      .then(json => setQuestion(json['questions'], setAnswer(json['answers'])))
-      .catch(error => setText(error));
-      unregister();
-  }
-
   function refresh() {
     setText('');
     setKeyword(['', '', ''])
-  }
-
-  function outputList() {
-    const questions = props.question
-    const answers = props.answer
-
-    return (
-      <ul>
-        {questions.map((question) =>
-          <ListItem key={question.toString()} value={question} />
-        )}
-        {answers.map((answer) =>
-          <ListItem key={answer.toString()} value={answer} />
-        )}
-      </ul>
-    )
-
   }
 
 
@@ -165,10 +147,6 @@ function Question_generation(props) {
     setText(event.target.value);
   }
   
-  const handleKeyword = (event) => {
-    const arr = event.target.value.replace(' ', '').split(',')
-    setKeyword(arr);
-  }
 
   function tempSlide(event, newValue) {
     setTemp(newValue);
@@ -195,7 +173,7 @@ function Question_generation(props) {
             name: 'models',
             id: 'model selection',
             }}>
-            <option value="korquad">Korquad v1.0</option>
+            <option value="korean">국립국어원 말뭉치</option>
           </NativeSelect>
           {/* <FormHelperText>Label + placeholder</FormHelperText> */}
         </FormControl>
@@ -216,24 +194,7 @@ function Question_generation(props) {
       </Toolbar>
       <Grid container spacing={2}  alignItems="center">
         <Grid item xs={8}>
-          <InputLabel shrink htmlFor="keyword input">
-            키워드
-          </InputLabel>
-          <Paper className={classes.paperPrimary}>
-            <Toolbar>
-              <Grid container spacing={2}  alignItems="center">
-                <TextField
-                  fullWidth
-                  placeholder = '키워드를 반점으로 나누어 입력해주세요. 예: 사과, 바나나, 오렌지'
-                  onChange = {handleKeyword}
-                  InputProps={{
-                    disableUnderline: true,
-                    className: classes.searchInput,
-                  }}
-                />
-              </Grid>
-            </Toolbar>
-          </Paper>
+
           <p></p>
           <InputLabel shrink htmlFor="context input">
             본문
@@ -246,7 +207,7 @@ function Question_generation(props) {
                     fullWidth
                     multiline
                     rows={10}
-                    placeholder='본문을 입력해주세요. 예: 사과는 맛있다. 맛있으면 바나나.'
+                    placeholder='본문을 입력해주세요.'
                     value={Text}
                     onChange={handleChange}
                     InputProps={{
@@ -272,46 +233,13 @@ function Question_generation(props) {
           <InputLabel shrink htmlFor="generation output">
             결과
           </InputLabel>
-          <Paper>
+          <Paper className={classes.paperPrimary}>
             <div className={classes.contentWrapper}>
-              <List>
                 <Grid container spacing={2}  alignItems="center">
-                  <Grid item xs={8}>
-                    <Typography color="textSecondary" align="center">
-                      {question[0]}
+                    <Typography color="textSecondary" align="center" display = 'block'>
+                      {summaries}
                     </Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography color="textSecondary" align="center">
-                      {answer[0]}
-                    </Typography>
-                  </Grid>
                 </Grid>
-                <Grid container spacing={2}  alignItems="center">
-                  <Grid item xs={8}>
-                    <Typography color="textSecondary" align="center">
-                      {question[1]}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography color="textSecondary" align="center">
-                      {answer[1]}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2}  alignItems="center">
-                  <Grid item xs={8}>
-                    <Typography color="textSecondary" align="center">
-                      {question[2]}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography color="textSecondary" align="center">
-                      {answer[2]}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </List>
             </div>
           </Paper>
         </Grid>
@@ -404,8 +332,8 @@ function Question_generation(props) {
   );
 }
 
-Question_generation.propTypes = {
+Article_summarization.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Question_generation);
+export default withStyles(styles)(Article_summarization);

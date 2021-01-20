@@ -1,8 +1,13 @@
+import json
+
+import torch
+from tokenizers import SentencePieceBPETokenizer
+from transformers import GPT2LMHeadModel
+
 from flask import Flask, Response, request, jsonify
 # from flask_cors import CORS
 
-from api import question_generation, article_summarization, review_generation, tale_generation, chat_bot
-
+from .api import question_generation, article_summarization, review_generation, tale_generation, chat_bot, config
 
 app = Flask(__name__)
 # cors = CORS(app, resource={r'/api/*': {'origin': '*'}})
@@ -38,7 +43,7 @@ def question_generation_api():
         data = request.get_json()
 
         content = data['content']
-        model = data['model']
+        model_file = config.QGConfig().model_dict[data['model']]
         temperature = float(data['temperature'])
         top_k = int(data['top_k'])
         top_p = float(data['top_p'])
@@ -46,7 +51,7 @@ def question_generation_api():
         keywords = data['keywords']
         sentence_length = int(data['sentence_length'])
 
-        result = question_generation.main(content, model, temperature, top_k, top_p, keywords, sentence_length)
+        result = question_generation.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, keywords, sentence_length)
 
         response.set_data(json.dumps(result, ensure_ascii=False))
 
@@ -67,7 +72,7 @@ def article_summarization_api():
         sentence_count(int): 출력 문장 수
 
     Output:
-        summary(str): 생성된 요약 문장 리스트
+        summary(str): 생성된 요약 본문
     """
     response = Response()
 
@@ -82,7 +87,7 @@ def article_summarization_api():
         data = request.get_json()
 
         content = data['content']
-        model = data['model']
+        model_file = config.ASConfig().model_dict[data['model']]
         temperature = float(data['temperature'])
         top_k = int(data['top_k'])
         top_p = float(data['top_p'])
@@ -90,7 +95,7 @@ def article_summarization_api():
         sentence_length = data['sentence_length']
         sentence_count = data['sentence_count']
 
-        result = article_summarization.main(content, model, temperature, top_k, top_p, sentence_length, sentence_count)
+        result = article_summarization.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, sentence_length, sentence_count)
 
         response.set_data(json.dumps(result, ensure_ascii=False))
 
@@ -107,13 +112,15 @@ def review_generation_api():
         top_k(int): top_k 값
         top_p(float): top_p 값
 
-        sentence_length(int): 출력 문장 길이
+        sentence_count(int): 출력 문장 수
         word_count(int): 출력 단어 수
-        flag(str): 문장추천(True) / 단어추천(False)
+        recommend_flag(bool): 문장추천(True) / 단어추천(False)
+        auto_flag(bool): 자동완성 ON(True) / OFF(False)
 
     Output:
         sentence(str): 생성된 문장
         words(list): 생성된 단어 리스트
+        paragraph(str): 자동완성된 문단
     """
     response = Response()
 
@@ -128,22 +135,21 @@ def review_generation_api():
         data = request.get_json()
 
         content = data['content']
-        model = data['model']
+        model_file = config.RGConfig().model_dict[data['model']]
         temperature = float(data['temperature'])
         top_k = int(data['top_k'])
         top_p = float(data['top_p'])
+        recommend_flag = data['recommend_flag']
+        auto_flag = data['auto_flag']
 
-        if data['flag'] == "True":
-            flag = True
+        if recommend_flag:
+            sentence_count = int(data['sentence_count'])
+            word_count = 0
         else:
-            flag = False
+            word_count = int(data['word_count'])
+            sentence_count = 0
 
-        if flag:
-            sentence_length = int(data['length'])
-        else:
-            word_count = int(data['count'])
-
-        result = review_generation.main(content, model, temperature, top_k, top_p, flag, sentence_length, word_count)
+        result = review_generation.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, recommend_flag, auto_flag, sentence_count, word_count)
 
         response.set_data(json.dumps(result, ensure_ascii=False))
 
@@ -160,13 +166,15 @@ def tale_generation_api():
         top_k(int): top_k 값
         top_p(float): top_p 값
 
-        length(int): 출력 문장 길이
-        count(int): 출력 단어 수
-        flag(str): 문장추천(True) / 단어추천(False)
+        sentence_count(int): 출력 문장 수
+        word_count(int): 출력 단어 수
+        recommend_flag(bool): 문장추천(True) / 단어추천(False)
+        auto_flag(bool): 자동완성 ON(True) / OFF(False)
 
     Output:
-        sentence(str): 생성된 문장
+        sentences(str): 생성된 문장 리스트
         words(list): 생성된 단어 리스트
+        paragraph(str): 자동완성된 문단
     """
     response = Response()
 
@@ -181,22 +189,21 @@ def tale_generation_api():
         data = request.get_json()
 
         content = data['content']
-        model = data['model']
+        model_file = config.TGConfig().model_dict[data['model']]
         temperature = float(data['temperature'])
         top_k = int(data['top_k'])
         top_p = float(data['top_p'])
+        recommend_flag = data['recommend_flag']
+        auto_flag = data['auto_flag']
 
-        if data['flag'] == "True":
-            flag = True
+        if recommend_flag:
+            sentence_count = int(data['sentence_count'])
+            word_count = 0
         else:
-            flag = False
+            word_count = int(data['word_count'])
+            sentence_count = 0
 
-        if flag:
-            sentence_length = int(data['length'])
-        else:
-            word_count = int(data['count'])
-
-        result = tale_generation.main(content, model, temperature, top_k, top_p, flag, sentence_length, word_count)
+        result = tale_generation.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, recommend_flag, auto_flag, sentence_count, word_count)
 
         response.set_data(json.dumps(result, ensure_ascii=False))
 
@@ -229,19 +236,16 @@ def chat_bot_api():
         data = request.get_json()
 
         content = data['content']
-        model = data['model']
+        model_file = config.CBConfig().model_dict[data['model']]
         temperature = float(data['temperature'])
         top_k = int(data['top_k'])
         top_p = float(data['top_p'])
 
-        result = chat_bot.main(content, model, temperature, top_k, top_p)
+        result = chat_bot.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p)
 
         response.set_data(json.dumps(result, ensure_ascii=False))
 
     return response
-
-
-import json
 
 
 @app.route('/api/test', methods=['GET', 'POST', 'OPTIONS'])
@@ -258,4 +262,12 @@ def test_api():
 
 
 if __name__ == '__main__':
+    device = torch.device("cuda" if torch.cuda.is_available else "cpu")
+    model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path="taeminlee/kogpt2")
+    tokenizer = SentencePieceBPETokenizer.from_file(
+        vocab_filename='./tokenizer/kogpt2_vocab.json',
+        merges_filename='./tokenizer/kogpt2_merges.txt',
+        add_prefix_space=False
+    )
+
     app.run(host='localhost', port=8888, debug=True)

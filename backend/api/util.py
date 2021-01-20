@@ -27,65 +27,110 @@ def top_p_logits(logits, top_p=0.0, filter_value=-float('Inf')):
     return logits
 
 
-def sample_sequence_sentence(model, vocab, tokenizer, device, text, temperature, top_k, top_p, sentence_length):
-    tokenized = tokenizer(text)  # 받은 문장
+def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k, top_p, sentence_count):
+    context_tokens = tokenizer.encode(text).ids  # 받은 문장
 
-    generated_text = ''
-    generated_length = 0
+    generated_text = []
 
-    if len(tokenized) > 1024:
-        tokenized = tokenized[len(tokenized) - 1000:]
+    generated_ids = []
 
-    """ START: Customization for sampling is optional """
-    while generated_length <= sentence_length:
-        input = torch.tensor([vocab[vocab.bos_token], ] + vocab[tokenized]).unsqueeze(0)
-        input = input.to(device)
+    bos_token = tokenizer.token_to_id("<s>")
+    eos_token = tokenizer.token_to_id("</s>")
 
-        predicts = model(input)
-        pred = predicts[0]
+    """ Get the first following N tokens """
+    input_ids = [bos_token] + context_tokens
 
-        # temperature applying
-        logits = pred
-        logits = logits[:, -1, :] / temperature
+    if len(input_ids) > 1024:
+        input_ids = input_ids[len(input_ids) - 1020:]
 
-        # top k sampling
-        logits = top_k_logits(logits, top_k)
+    input_ids = torch.tensor([input_ids]).cuda()
 
-        # top p sampling
-        logits = top_p_logits(logits, top_p)
+    input_ids.to(device)
 
-        # probabilities
-        log_probs = F.softmax(logits, dim=-1)
+    predicts = model(input_ids)
+    pred = predicts[0]
 
-        prev = torch.multinomial(log_probs, num_samples=1)
+    # temperature applying
+    logits = pred
+    logits = logits[:, -1, :] / temperature
 
-        generated = vocab.to_tokens(prev.squeeze().tolist())
+    # top k sampling
+    logits = top_k_logits(logits, top_k)
 
-        if generated == '</s>':
-            text += generated.replace('▁', ' ')
-            text += '\n'
-            generated_text += generated.replace('▁', ' ')
-            generated_text += '\n'
-            break
+    # top p sampling
+    logits = top_p_logits(logits, top_p)
 
-        text += generated.replace('▁', ' ')
-        generated_text += generated.replace('▁', ' ')
-        generated_length += 1
+    # probabilities
+    log_probs = F.softmax(logits, dim=-1)
 
-        tokenized = tokenizer(text)
-    """ END: Customization for sampling is optional """
+    prev = torch.multinomial(log_probs, num_samples=sentence_count)
 
-    return generated_text.replace('</s>', '.')
+    for item in prev.squeeze().tolist():
+        generated_ids.append([item])
+        item = tokenizer.id_to_token(item)
+        item = item.replace('▁', '', 1)
+        generated_text.append(item)
+
+    """ Get to the end of sentence with each first tokens """
+    for idx in range(sentence_count):
+        while True:
+            input_ids = [bos_token] + context_tokens + generated_ids[idx]
+
+            if len(input_ids) > 1024:
+                input_ids = input_ids[len(input_ids) - 1020:]
+
+            input_ids = torch.tensor([input_ids]).cuda()
+
+            input_ids.to(device)
+
+            predicts = model(input_ids)
+            pred = predicts[0]
+
+            # temperature applying
+            logits = pred
+            logits = logits[:, -1, :] / temperature
+
+            # top k sampling
+            logits = top_k_logits(logits, top_k)
+
+            # top p sampling
+            logits = top_p_logits(logits, top_p)
+
+            # probabilities
+            log_probs = F.softmax(logits, dim=-1)
+
+            prev = torch.multinomial(log_probs, num_samples=1)
+
+            generated_ids[idx] += prev.tolist()[0]
+
+            generated_token = tokenizer.id_to_token(prev)
+
+            if generated_token == '.' or generated_token == '</s>':
+                generated_token = generated_token.replace('▁', ' ')
+                generated_token = generated_token.replace('</s>', '')
+                generated_text[idx] += generated_token
+                break
+            else:
+                generated_token = generated_token.replace('▁', ' ')
+                generated_text[idx] += generated_token
+
+    return generated_text
 
 
-def sample_sequence_words(model, vocab, tokenizer, device, text, temperature, top_k, top_p, word_count):
-    tokenized = tokenizer(text)  # 받은 문장
+def sample_sequence_words(model, tokenizer, device, text, temperature, top_k, top_p, word_count):
+    context_tokens = tokenizer.encode(text).ids  # 받은 문장
 
-    if len(tokenized) > 1024:
-        tokenized = tokenized[len(tokenized) - 1000:]
+    generated_words = []
 
-    input_ids = torch.tensor([vocab[vocab.bos_token], ] + vocab[tokenized]).unsqueeze(0)
-    input_ids = input_ids.to(device)
+    bos_token = tokenizer.token_to_id("<s>")
+    eos_token = tokenizer.token_to_id("</s>")
+
+    input_ids = [bos_token] + context_tokens
+
+    if len(input_ids) > 1024:
+        input_ids = input_ids[len(input_ids) - 1000:]
+
+    input_ids = torch.tensor([input_ids]).cuda()
 
     predicts = model(input_ids)
     pred = predicts[0]
@@ -105,6 +150,71 @@ def sample_sequence_words(model, vocab, tokenizer, device, text, temperature, to
 
     prev = torch.multinomial(log_probs, num_samples=word_count)
 
-    generated_words = vocab.to_tokens(prev.squeeze().tolist())
+    for item in prev.squeeze().tolist():
+        item = tokenizer.id_to_token(item)
+        item = item.replace('▁', '', 1)
+        generated_words.append(item)
 
     return generated_words
+
+
+def sample_sequence_paragraph(model, tokenizer, device, text, temperature, top_k, top_p):
+    context_tokens = tokenizer.encode(text).ids  # 받은 문장
+
+    generated_text = ''
+    generated_count = 0
+
+    generated_id = []
+
+    bos_token = tokenizer.token_to_id("<s>")
+    eos_token = tokenizer.token_to_id("</s>")
+
+    while generated_count <= 3:
+        input_ids = [bos_token] + context_tokens + generated_id
+
+        if len(input_ids) > 1024:
+            input_ids = input_ids[len(input_ids) - 1020:]
+
+        input_ids = torch.tensor([input_ids]).cuda()
+
+        input_ids.to(device)
+
+        predicts = model(input_ids)
+        pred = predicts[0]
+
+        # temperature applying
+        logits = pred
+        logits = logits[:, -1, :] / temperature
+
+        # top k sampling
+        logits = top_k_logits(logits, top_k)
+
+        # top p sampling
+        logits = top_p_logits(logits, top_p)
+
+        # probabilities
+        log_probs = F.softmax(logits, dim=-1)
+
+        prev = torch.multinomial(log_probs, num_samples=1)
+
+        generated_id += prev.tolist()[0]
+
+        generated_token = tokenizer.id_to_token(prev)
+
+        if generated_token == '</s>':
+            generated_token = generated_token.replace('▁', ' ')
+            generated_token = generated_token.replace('</s>', '')
+            generated_text += generated_token
+            generated_count += 1
+        elif generated_token == '<s>':
+            generated_token = generated_token.replace('▁', ' ')
+            generated_token = generated_token.replace('<s>', '')
+            generated_text += generated_token
+        elif generated_token == '<unk>':
+            generated_token = generated_token.replace('▁', ' ')
+            generated_token = generated_token.replace('<unk>', '')
+            generated_text += generated_token
+        else:
+            generated_text += generated_token.replace('▁', ' ')
+
+    return generated_text
