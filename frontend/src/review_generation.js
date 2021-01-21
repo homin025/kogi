@@ -33,7 +33,7 @@ import CommentIcon from '@material-ui/icons/Comment';
 const styles = (theme) => ({
   paperPrimary: {
     maxWidth: 3000,
-    margin: 'auto',
+    margin: theme.spacing(1),
     overflow: 'hidden',
   },
   paperSecondary: {
@@ -90,6 +90,7 @@ function Review_generation(props) {
   let [state, setState] = useState(false);
   let [time, setTime] = useState();
   let [sent, setSent] = useState(false);
+
   const unregister = FetchIntercept.register({
     request: function (url, config) {
       setState(true);
@@ -132,11 +133,13 @@ function Review_generation(props) {
       },
       body: raw
     };
+
     const start = new Date();
+
     fetch(`/api/review-generation`, requestOptions)
       .then(response => response.json())
       .then(json => {
-        setRecommendommend(json['sentence'], json['words'])
+        recommendInput(json['sentence'], json['words'])
       setTime(`${(new Date().getTime()-start.getTime())/1000}`)
       setSent(true);
     })
@@ -210,7 +213,7 @@ function Review_generation(props) {
     setRecommend(arr);
   }
 
-  function setRecommendommend(sentenceList, wordsList) {
+  function recommendInput(sentenceList, wordsList) {
     let arr = [];
     for (let i = 0; i < count; i++) {
       arr = [...arr, { word: wordsList[i], sentence: sentenceList[i], pos: i }];
@@ -255,7 +258,7 @@ function Review_generation(props) {
         </FormControl>
         <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel shrink htmlFor="model selection">
-            생성예시 개수
+            생성 개수
           </InputLabel>
           <Select
             native
@@ -292,46 +295,46 @@ function Review_generation(props) {
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={8}>
           <Toolbar>
-          <InputLabel shrink htmlFor="context input">
-            본문
-          </InputLabel>
+            <InputLabel shrink htmlFor="context input">
+              본문
+            </InputLabel>
           </Toolbar>
           <Paper className={classes.paperPrimary}>
             <Toolbar>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={12}
-                    placeholder='기사를 입력해주세요'
-                    value={Text}
-                    onChange={handleChange}
-                    InputProps={{
-                      disableUnderline: true,
-                      className: classes.searchInput,
-                    }}
-                  />
+              <TextField
+                fullWidth
+                multiline
+                rows={12}
+                placeholder='기사를 입력해주세요'
+                value={Text}
+                onChange={handleChange}
+                InputProps={{
+                  disableUnderline: true,
+                  className: classes.searchInput,
+                }}
+              />
             </Toolbar>
           </Paper>
           <div style = {{float:'right'}}>
-          <Toolbar>
-          <Typography color = "textSecondary">
-              {sent ? `응답시간 : ${time}s` : ''}
-          </Typography>
-            <span>&nbsp;&nbsp;&nbsp;</span>
-          <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
-                    {checkedAuto ? '자동생성' : (checked ? '문장추천' : '단어추천')}  
-                  </Button>
-                  <Tooltip title="Refresh">
-                    <IconButton onClick={refresh}>
-                      <RefreshIcon className={classes.block} color="inherit" />
-                    </IconButton>
-                  </Tooltip>
-          </Toolbar>
+            <Toolbar>
+              <Typography color = "textSecondary">
+                {sent ? `응답시간 : ${time}s` : ''}
+              </Typography>
+              <span>&nbsp;&nbsp;&nbsp;</span>
+              <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
+                {checkedAuto ? '자동생성' : (checked ? '문장추천' : '단어추천')}  
+              </Button>
+              <Tooltip title="Refresh">
+                <IconButton onClick={refresh}>
+                  <RefreshIcon className={classes.block} color="inherit" />
+                </IconButton>
+              </Tooltip>
+            </Toolbar>
           </div>
           <Toolbar>
-          <InputLabel shrink htmlFor="context input">
-            결과
-          </InputLabel>
+            <InputLabel shrink htmlFor="context input">
+              결과
+            </InputLabel>
           </Toolbar>
           <Paper className={classes.paperPrimary}>
             <Toolbar>
@@ -362,11 +365,11 @@ function Review_generation(props) {
             <Toolbar alignItems="center">
               <Grid item xs={11}>
                 <Typography id="temperature" gutterBottom>
-                  temperature : {temperature}
+                  Temperature = {temperature}
                 </Typography>
               </Grid>
               <Grid item xs={1}>
-                <Tooltip title="생성되는 글의 창의성을 조절하는 값입니다.">
+                <Tooltip title={<h2>생성되는 글의 창의성을 조절합니다</h2>}>
                   <IconButton size='small' color="inherit">
                     <HelpIcon />
                   </IconButton>
@@ -387,11 +390,11 @@ function Review_generation(props) {
             <Toolbar alignItems="center">
               <Grid item xs={11}>
                 <Typography id="top_p" gutterBottom>
-                  top_p : {top_p}
+                  Top P = {top_p}
                 </Typography>
               </Grid>
               <Grid item xs={1}>
-                <Tooltip title="샘플링된 단어 중 top_p 확률 이상의 단어만 선택합니다.">
+                <Tooltip title={<h2>샘플링될 단어의 누적분포 합이 P보다 크지 않도록 제한합니다</h2>}>
                   <IconButton size='small' color="inherit">
                     <HelpIcon />
                   </IconButton>
@@ -412,11 +415,11 @@ function Review_generation(props) {
             <Toolbar alignItems="center">
               <Grid item xs={11}>
                 <Typography id="top_k" gutterBottom>
-                  top_k : {top_k}
+                  Top K = {top_k}
                 </Typography>
               </Grid>
               <Grid item xs={1}>
-                <Tooltip title="샘플링된 단어 중 상위 k개의 단어만 선택합니다.">
+                <Tooltip title={<h2>샘플링될 단어의 갯수를 K개로 제한합니다</h2>}>
                   <IconButton size='small' color="inherit">
                     <HelpIcon />
                   </IconButton>

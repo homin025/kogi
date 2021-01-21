@@ -21,7 +21,7 @@ import QuestionAnswerSharpIcon from '@material-ui/icons/QuestionAnswerSharp';
 import AssignmentSharpIcon from '@material-ui/icons/AssignmentSharp';
 import MenuBookSharpIcon from '@material-ui/icons/MenuBookSharp';
 import EditLocationSharpIcon from '@material-ui/icons/EditLocationSharp';
-import Box from'@material-ui/core/Box'
+
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
 const styles = (theme) => ({
@@ -99,7 +99,6 @@ function Header(props) {
         elevation={0}
       >
         <Toolbar>
-          <Box fontFamily = "redPost">
           <Grid container alignItems="center" spacing={1}>
             <Grid item xs>
               <Typography color="inherit" variant="h5" component="h1">
@@ -111,9 +110,7 @@ function Header(props) {
                 Web setup
               </Button>
             </Grid> */}
-            
           </Grid>
-          </Box>
         </Toolbar>
       </AppBar>
       {/* <AppBar

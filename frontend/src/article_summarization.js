@@ -74,6 +74,7 @@ function Article_summarization(props) {
   let [state, setState] = useState(false);
   let [time, setTime] = useState();
   let [sent, setSent] = useState(false);
+
   function _post(Data) {
     const raw = JSON.stringify(Data);
 
@@ -86,7 +87,9 @@ function Article_summarization(props) {
       },
       body: raw
     };
+
     const start = new Date();
+
     fetch(`/api/article-summarization`, requestOptions)
       .then(response =>response.json())
       .then(json => {
@@ -250,50 +253,51 @@ function Article_summarization(props) {
           />
         </FormControl>
       </Toolbar>
+      <p></p>
       <Grid container spacing={2}  alignItems="center">
         <Grid item xs={8}>
           <Toolbar>
-          <InputLabel shrink htmlFor="context input">
-            본문
-          </InputLabel>
+            <InputLabel shrink htmlFor="context input">
+              본문
+            </InputLabel>
           </Toolbar>
           <Paper className={classes.paperPrimary}>
             <Toolbar>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={12}
-                    placeholder='본문을 입력해주세요.'
-                    value={text}
-                    onChange={handleChange}
-                    InputProps={{
-                      disableUnderline: true,
-                      className: classes.searchInput,
-                    }}
-                  />
+              <TextField
+                fullWidth
+                multiline
+                rows={12}
+                placeholder='본문을 입력해주세요.'
+                value={text}
+                onChange={handleChange}
+                InputProps={{
+                  disableUnderline: true,
+                  className: classes.searchInput,
+                }}
+              />
             </Toolbar>
           </Paper>
           
           <div style = {{float:'right'}}>
-          <Toolbar>
-          <Typography color = "textSecondary">
-              {sent ? `응답시간 : ${time}s` : ''}
-          </Typography>
-            <span>&nbsp;&nbsp;&nbsp;</span>
-          <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
-                    요약생성
-                  </Button>
-                  <Tooltip title="Refresh">
-                    <IconButton onClick={refresh}>
-                      <RefreshIcon className={classes.block} color="inherit" />
-                    </IconButton>
-                  </Tooltip>
-          </Toolbar>
+            <Toolbar>
+              <Typography color = "textSecondary">
+                {sent ? `응답시간 : ${time}s` : ''}
+              </Typography>
+              <span>&nbsp;&nbsp;&nbsp;</span>
+              <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
+                요약생성
+              </Button>
+              <Tooltip title="Refresh">
+                <IconButton onClick={refresh}>
+                  <RefreshIcon className={classes.block} color="inherit" />
+                </IconButton>
+              </Tooltip>
+            </Toolbar>
           </div>
           <Toolbar>
-          <InputLabel shrink htmlFor="generation output">
-            생성 결과
-          </InputLabel>
+            <InputLabel shrink htmlFor="generation output">
+              생성 결과
+            </InputLabel>
           </Toolbar>
           <Paper className={classes.paperPrimary}>
             <Toolbar>
@@ -329,7 +333,7 @@ function Article_summarization(props) {
             <Toolbar alignItems="center">
               <Grid item xs = {11}>
                 <Typography id="temperature" gutterBottom>
-                    Temperature = {temperature} 
+                    Temperature = {temperature}
                 </Typography> 
               </Grid>
               <Grid item xs = {1}>
