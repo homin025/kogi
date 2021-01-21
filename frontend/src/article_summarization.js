@@ -250,7 +250,6 @@ function Article_summarization(props) {
           />
         </FormControl>
       </Toolbar>
-      <p></p>
       <Grid container spacing={2}  alignItems="center">
         <Grid item xs={8}>
           <Toolbar>
