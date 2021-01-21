@@ -24,9 +24,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FetchIntercept from 'fetch-intercept';
 
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-
-// const apiURL = "http://14.49.45.139:9999";
+//const apiURL = "http://14.49.45.139:9999";
 
 const styles = (theme) => ({
   paperPrimary: {
@@ -61,6 +59,9 @@ const styles = (theme) => ({
     margin: theme.spacing(1),
     minWidth: 120,
   },
+  buttons: {
+    minWidth: 200,
+  },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
     color: '#fff',
@@ -78,7 +79,8 @@ function Question_generation(props) {
   let [top_p, setTopp] = useState(0.9);
   let [top_k, setTopk] = useState(40);
   let [state, setState] = useState(false);
-
+  let [time, setTime] = useState();
+  let [sent, setSent] = useState(false);
   function _post(Data) {
     const raw = JSON.stringify(Data);
 
@@ -91,17 +93,26 @@ function Question_generation(props) {
       },
       body: raw
     };
-
+    const start = new Date();
     fetch(`/api/question-generation`, requestOptions)
       .then(response => response.json())
-      .then(json => setQuestion(json['questions'], setAnswer(json['answers'])))
-      .catch(error => setText(error));
+      .then(json => {
+        setQuestion(json['questions'], setAnswer(json['answers']));
+        setTime(`${(new Date().getTime()-start.getTime())/1000}`)
+        setSent(true);
+      })
+      .catch(error => {
+        setText(error);
+        setTime(`${(new Date().getTime()-start.getTime())/1000}`)
+        setSent(true);
+      });
       unregister();
   }
 
   const unregister = FetchIntercept.register({
     request: function (url, config) {
         setState(true);
+
         return [url, config];
     },
 
@@ -123,7 +134,8 @@ function Question_generation(props) {
 
   function refresh() {
     setText('');
-    setKeyword(['', '', ''])
+    setKeyword([])
+    setSent(false);
   }
 
   function handleClick() {
@@ -226,19 +238,41 @@ function Question_generation(props) {
               id: 'example selection',
             }}>
             <option value={0}>없음</option>
-            <option value={1}>예시 1</option>
-            <option value={2}>예시 2</option>
-            <option value={3}>예시 3</option>
+            <option value={1}>코로나 대응</option>
+            <option value={2}>도깨비 마을</option>
+            <option value={3}>해바라기</option>
           </Select>
         </FormControl>
         <span>&nbsp;&nbsp;&nbsp;</span>
       </Toolbar>
-      <p></p>
       <Grid container spacing={2}  alignItems="center">
         <Grid item xs={8}>
+          <Toolbar>
+          <InputLabel shrink htmlFor="context input">
+            본문
+          </InputLabel>
+          </Toolbar>
+          <Paper className={classes.paperPrimary}>
+            <Toolbar>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={12}
+                    placeholder='본문을 입력해주세요.'
+                    value={text}
+                    onChange={handleChange}
+                    InputProps={{
+                      disableUnderline: true,
+                      className: classes.searchInput,
+                    }}
+                  />
+            </Toolbar>
+          </Paper>
+          <Toolbar>
           <InputLabel shrink htmlFor="keyword input">
             키워드
           </InputLabel>
+          </Toolbar>
           <Paper className={classes.paperPrimary}>
             <Toolbar>
               <Grid container spacing={2}  alignItems="center">
@@ -257,52 +291,36 @@ function Question_generation(props) {
               </Grid>
             </Toolbar>
           </Paper>
-          <p></p>
-          <InputLabel shrink htmlFor="context input">
-            본문
-          </InputLabel>
-          <Paper className={classes.paperPrimary}>
-            <Toolbar>
-              <Grid container spacing={2}  alignItems="center">
-                <Grid item xs>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={10}
-                    placeholder='본문을 입력해주세요.'
-                    value={text}
-                    onChange={handleChange}
-                    InputProps={{
-                      disableUnderline: true,
-                      className: classes.searchInput,
-                    }}
-                  />
-                </Grid>
-                <Grid item>
-                  <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
-                    생성
+
+          <div style = {{float:'right'}}>
+          <Toolbar>
+          <Typography color = "textSecondary">
+              {sent ? `응답시간 : ${time}s` : ''}
+          </Typography>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+          <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
+                    질문생성
                   </Button>
                   <Tooltip title="Refresh">
                     <IconButton onClick={refresh}>
                       <RefreshIcon className={classes.block} color="inherit" />
                     </IconButton>
                   </Tooltip>
-                </Grid>
-              </Grid>
-            </Toolbar>
-          </Paper>
-          <p></p>
+          </Toolbar>
+          </div>
+          <Toolbar>
           <InputLabel shrink htmlFor="generation output">
             결과
           </InputLabel>
+          </Toolbar>
           <Paper className={classes.paperPrimary}>
             <Toolbar>
               <List>
                 {question.map((item, index) => (
                   <ListItem alignItems="flex-start">
-                    <ListItemIcon>
-                      <ArrowForwardIosIcon />
-                    </ListItemIcon>
+                    <ListItemText>
+                      {index}. 
+                    </ListItemText>
                     <ListItemText>
                       질문: {question[index]}
                     </ListItemText>

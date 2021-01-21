@@ -17,7 +17,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import kogi from './kogi.jpg';
-
+import './App.css';
+import fontFamily from '@material-ui/core/Typography';
 import ContactSupportSharpIcon from '@material-ui/icons/ContactSupportSharp';
 import QuestionAnswerSharpIcon from '@material-ui/icons/QuestionAnswerSharp';
 import AssignmentSharpIcon from '@material-ui/icons/AssignmentSharp';
@@ -33,11 +34,11 @@ let theme = createMuiTheme({
     },
   },
   typography: {
-    h5: {
-      fontWeight: 500,
-      fontSize: 26,
-      letterSpacing: 0.5,
-    },
+    "fontFamily" : `"hoonDbk"`,
+    "fontSize" : 18,
+    "fontWeightLight": 300,
+    "fontWeightRegular": 400,
+    "fontWeightMedium": 500,
   },
   shape: {
     borderRadius: 8,

@@ -88,7 +88,8 @@ function Review_generation(props) {
   let [checked, setChecked] = React.useState(true);
   let [checkedAuto, setCheckedAuto] = React.useState(false);
   let [state, setState] = useState(false);
-
+  let [time, setTime] = useState();
+  let [sent, setSent] = useState(false);
   const unregister = FetchIntercept.register({
     request: function (url, config) {
       setState(true);
@@ -131,16 +132,26 @@ function Review_generation(props) {
       },
       body: raw
     };
-
+    const start = new Date();
     fetch(`/api/review-generation`, requestOptions)
       .then(response => response.json())
-      .then(json => setRecommendommend(json['sentence'], json['words']))
-      .catch(error => setText(error));
+      .then(json => {
+        setRecommendommend(json['sentence'], json['words'])
+      setTime(`${(new Date().getTime()-start.getTime())/1000}`)
+      setSent(true);
+    })
+      .catch(error => {
+        setText(error);
+        setTime(`${(new Date().getTime()-start.getTime())/1000}`)
+        setSent(true);
+      });
     unregister();
   }
 
   function refresh() {
     setText('');
+    recommendCount(count);
+    setSent(false);
   }
 
   const handleChange = (event) => {
@@ -280,17 +291,17 @@ function Review_generation(props) {
 
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={8}>
+          <Toolbar>
           <InputLabel shrink htmlFor="context input">
             본문
           </InputLabel>
+          </Toolbar>
           <Paper className={classes.paperPrimary}>
             <Toolbar>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs>
                   <TextField
                     fullWidth
                     multiline
-                    rows={10}
+                    rows={12}
                     placeholder='기사를 입력해주세요'
                     value={Text}
                     onChange={handleChange}
@@ -299,24 +310,29 @@ function Review_generation(props) {
                       className: classes.searchInput,
                     }}
                   />
-                </Grid>
-                <Grid item>
-                  <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
-                    생성
-                    </Button>
+            </Toolbar>
+          </Paper>
+          <div style = {{float:'right'}}>
+          <Toolbar>
+          <Typography color = "textSecondary">
+              {sent ? `응답시간 : ${time}s` : ''}
+          </Typography>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+          <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
+                    {checkedAuto ? '자동생성' : (checked ? '문장추천' : '단어추천')}  
+                  </Button>
                   <Tooltip title="Refresh">
                     <IconButton onClick={refresh}>
                       <RefreshIcon className={classes.block} color="inherit" />
                     </IconButton>
                   </Tooltip>
-                </Grid>
-              </Grid>
-            </Toolbar>
-          </Paper>
-          <p />
+          </Toolbar>
+          </div>
+          <Toolbar>
           <InputLabel shrink htmlFor="context input">
             결과
           </InputLabel>
+          </Toolbar>
           <Paper className={classes.paperPrimary}>
             <Toolbar>
               <List component="nav">
