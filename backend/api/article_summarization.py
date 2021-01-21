@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 
-def main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, sentence_length, sentence_count):
+def main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, sentence_length):
     seed = random.randint(0, 2147483647)
     np.random.seed(seed)
     torch.random.manual_seed(seed)
@@ -39,8 +39,8 @@ def main(content, model, tokenizer, device, model_file, temperature, top_k, top_
     output = model.generate(
         input_ids=input_ids,
         attention_masks=attention_mask,
-        max_length=len_input_ids+250,
-        min_length=len_input_ids+5,
+        max_length=len_input_ids+sentence_length,
+        min_length=len_input_ids,
         pad_token_id=0,
         bos_token_id=1,
         eos_token_id=2,

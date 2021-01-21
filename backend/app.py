@@ -7,6 +7,8 @@ from transformers import GPT2LMHeadModel
 from flask import Flask, Response, request, jsonify
 # from flask_cors import CORS
 
+import pymysql
+
 from api import question_generation, article_summarization, review_generation, tale_generation, chat_bot, config
 
 app = Flask(__name__)
@@ -69,7 +71,6 @@ def article_summarization_api():
         top_p(float): top_p 값
 
         sentence_length(int): 출력 문장 길이
-        sentence_count(int): 출력 문장 수
 
     Output:
         summary(str): 생성된 요약 본문
@@ -93,9 +94,55 @@ def article_summarization_api():
         top_p = float(data['top_p'])
 
         sentence_length = data['sentence_length']
-        sentence_count = data['sentence_count']
 
-        result = article_summarization.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, sentence_length, sentence_count)
+        result = article_summarization.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, sentence_length)
+
+        response.set_data(json.dumps(result, ensure_ascii=False))
+
+    return response
+
+
+@app.route('/api/tale-generation', methods=['POST', 'OPTIONS'])
+def tale_generation_api():
+    """ Tale Generation API
+    Input:
+        content(str): 입력 내용
+        model(str): 모델명
+        temperature(float): 온도 값
+        top_k(int): top_k 값
+        top_p(float): top_p 값
+
+        count(int): 출력 문장 / 단어 수
+        recommend_flag(bool): 문장추천(True) / 단어추천(False)
+        auto_flag(bool): 자동완성 ON(True) / OFF(False)
+
+    Output:
+        sentences(str): 생성된 문장 리스트
+        words(list): 생성된 단어 리스트
+        paragraph(str): 자동완성된 문단
+    """
+    response = Response()
+
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
+
+    elif request.method == 'POST':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+
+        data = request.get_json()
+
+        content = data['content']
+        model_file = config.TGConfig().model_dict[data['model']]
+        temperature = float(data['temperature'])
+        top_k = int(data['top_k'])
+        top_p = float(data['top_p'])
+        recommend_flag = data['recommend_flag']
+        auto_flag = data['auto_flag']
+        count = int(data['count'])
+
+        result = tale_generation.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, recommend_flag, auto_flag, count)
 
         response.set_data(json.dumps(result, ensure_ascii=False))
 
@@ -156,60 +203,6 @@ def review_generation_api():
     return response
 
 
-@app.route('/api/tale-generation', methods=['POST', 'OPTIONS'])
-def tale_generation_api():
-    """ Tale Generation API
-    Input:
-        content(str): 입력 내용
-        model(str): 모델명
-        temperature(float): 온도 값
-        top_k(int): top_k 값
-        top_p(float): top_p 값
-
-        sentence_count(int): 출력 문장 수
-        word_count(int): 출력 단어 수
-        recommend_flag(bool): 문장추천(True) / 단어추천(False)
-        auto_flag(bool): 자동완성 ON(True) / OFF(False)
-
-    Output:
-        sentences(str): 생성된 문장 리스트
-        words(list): 생성된 단어 리스트
-        paragraph(str): 자동완성된 문단
-    """
-    response = Response()
-
-    if request.method == 'OPTIONS':
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add('Access-Control-Allow-Headers', "*")
-        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
-
-    elif request.method == 'POST':
-        response.headers.add("Access-Control-Allow-Origin", "*")
-
-        data = request.get_json()
-
-        content = data['content']
-        model_file = config.TGConfig().model_dict[data['model']]
-        temperature = float(data['temperature'])
-        top_k = int(data['top_k'])
-        top_p = float(data['top_p'])
-        recommend_flag = data['recommend_flag']
-        auto_flag = data['auto_flag']
-
-        if recommend_flag:
-            sentence_count = int(data['sentence_count'])
-            word_count = 0
-        else:
-            word_count = int(data['word_count'])
-            sentence_count = 0
-
-        result = tale_generation.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, recommend_flag, auto_flag, sentence_count, word_count)
-
-        response.set_data(json.dumps(result, ensure_ascii=False))
-
-    return response
-
-
 @app.route('/api/chat-bot', methods=['POST', 'OPTIONS'])
 def chat_bot_api():
     """ Chat Bot API
@@ -248,10 +241,92 @@ def chat_bot_api():
     return response
 
 
+@app.route('/api/get-example', methods=['POST', 'OPTIONS'])
+def get_data_api():
+    """ Get Example API
+    Input:
+        testID(str): API 이름
+        index(int): 데이터 순서
+
+    Output:
+        content(str): 데이터 본문
+        질문생성 keyword(str): 데이터 키워드
+        기사요약 summary(str): 데이터 요약
+        리뷰생성
+        동화창작
+    """
+    response = Response()
+
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
+
+    elif request.method == 'POST':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+
+        data = request.get_json()
+
+        textID = data['textID']
+        index = data['index']
+
+        connection = pymysql.connect(
+            host='localhost',
+            user='woongjin',
+            passwd='1029',
+            db='kogi',
+            charset='utf8'
+        )
+
+        if textID == 'QuestionGeneration':
+            result = None
+            try:
+                with connection.cursor() as cursor:
+                    sql = 'SELECT * FROM question where id =' + str(index)
+                    cursor.execute(sql)
+                    result = cursor.fetchall()
+                print('loading data from database succeeds')
+            except:
+                print('loading data from database fails')
+
+            if result:
+                content = result[0][2]
+                keyword = result[0][3].split(',')
+            else:
+                content = ""
+                keyword = [""]
+
+            response.set_data(json.dumps({'content': content, 'keyword': keyword}))
+
+        elif textID == 'ArticleSummarization':
+            result = None
+            try:
+                with connection.cursor() as cursor:
+                    sql = 'SELECT * FROM summary where id =' + str(index)
+                    cursor.execute(sql)
+                    result = cursor.fetchall()
+                print('loading data from database succeeds')
+            except:
+                print('loading data from database fails')
+
+            if result:
+                content = result[0][2]
+                summary = result[0][4]
+            else:
+                content = ""
+                summary = ""
+
+            response.set_data(json.dumps({'content': content, 'summary': summary}))
+
+        # elif textID == 'TaleGeneration':
+
+        # elif textID == 'ReviewGeneration':
+
+    return response
+
+
 @app.route('/api/test', methods=['GET', 'POST', 'OPTIONS'])
 def test_api():
-    data = request.get_json()
-
     result = Response()
 
     result.headers.add('Access-Control-Allow-Origin', "*")
@@ -270,4 +345,4 @@ if __name__ == '__main__':
         add_prefix_space=False
     )
 
-    app.run(host='localhost', port=8888, debug=True)
+    app.run(host='localhost', port=9999, debug=True)

@@ -26,6 +26,8 @@ import FetchIntercept from 'fetch-intercept';
 
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
+// const apiURL = "http://14.49.45.139:9999";
+
 const styles = (theme) => ({
   paperPrimary: {
     maxWidth: 3000,
@@ -65,8 +67,6 @@ const styles = (theme) => ({
   },
 });
 
-const apiURL = "http://localhost:8888";
-
 function Question_generation(props) {
   const { classes } = props;
   let [model, setModel] = useState('korquad');
@@ -92,7 +92,7 @@ function Question_generation(props) {
       body: raw
     };
 
-    fetch(`${apiURL}/api/question-generation`, requestOptions)
+    fetch(`/api/question-generation`, requestOptions)
       .then(response => response.json())
       .then(json => setQuestion(json['questions'], setAnswer(json['answers'])))
       .catch(error => setText(error));
@@ -135,8 +135,7 @@ function Question_generation(props) {
       top_p: top_p,
       top_k: top_k,
       keywords: keyword,
-      sentence_length: "10",
-      sentence_count: "3"
+      sentence_length: "10"
     }
     setState(true);
     _post(Data);
@@ -144,6 +143,35 @@ function Question_generation(props) {
 
   const handleModel = (event) => {
     setModel(event.target.value);
+  };
+
+  const handleExample = (event) => {
+    const Data = {
+      textID: "QuestionGeneration",
+      index: event.target.value
+    }
+    setState(true);
+
+    if (event.target.value === 0) return;
+
+    const raw = JSON.stringify(Data);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': '*',
+      },
+      body: raw
+    };
+
+    fetch(`/api/get-example`, requestOptions)
+      .then(response =>response.json())
+      .then(json => setText(json['content'], setKeyword(json['keyword'])))
+      .then()
+      .catch(error => setText(error));
+      unregister();
   };
   
   const handleChange = (event) => {
@@ -191,12 +219,16 @@ function Question_generation(props) {
           </InputLabel>
           <Select
             native
+            onChange={handleExample}
             label="Example"
             inputProps={{
               name: 'examples',
               id: 'example selection',
             }}>
-            <option value="">None</option>
+            <option value={0}>없음</option>
+            <option value={1}>예시 1</option>
+            <option value={2}>예시 2</option>
+            <option value={3}>예시 3</option>
           </Select>
         </FormControl>
         <span>&nbsp;&nbsp;&nbsp;</span>
@@ -215,6 +247,7 @@ function Question_generation(props) {
                     fullWidth
                     placeholder='키워드를 반점으로 나누어 입력해주세요.'
                     onChange={handleKeyword}
+                    value={keyword.join()}
                     InputProps={{
                       disableUnderline: true,
                       className: classes.searchInput,

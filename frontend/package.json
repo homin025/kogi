@@ -19,8 +19,9 @@
     "request": "^2.88.2",
     "web-vitals": "^0.2.4"
   },
+  "proxy": "http://localhost:9999",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "HOST='0.0.0.0' PORT=8888 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

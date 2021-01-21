@@ -11,15 +11,16 @@ import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import Slider from '@material-ui/core/Slider';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import HelpIcon from '@material-ui/icons/Help';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FetchIntercept from 'fetch-intercept';
+
+// const apiURL = "http://localhost:9999";
 
 const styles = (theme) => ({
   paperPrimary: {
@@ -60,14 +61,14 @@ const styles = (theme) => ({
   },
 });
 
-const apiURL = "http://localhost:8888";
-
 function Article_summarization(props) {
   const { classes } = props;
   let [model, setModel] = useState('korean');
   let [text, setText] = useState('');
   let [keyword, setKeyword] = useState([]);
   let [summaries, setSummaries] = useState('');
+  let [actualSummaries, setActualSummaries] = useState('');
+  let [sentenceLength, setSentenceLength] = useState(50);
   let [temperature, setTemperature] = useState(1.0);
   let [top_p, setTopp] = useState(0.9);
   let [top_k, setTopk] = useState(40);
@@ -86,7 +87,7 @@ function Article_summarization(props) {
       body: raw
     };
 
-    fetch(`${apiURL}/api/article-summarization`, requestOptions)
+    fetch(`/api/article-summarization`, requestOptions)
       .then(response =>response.json())
       .then(json => setSummaries(json['summary']))
       .catch(error => setText(error));
@@ -129,8 +130,7 @@ function Article_summarization(props) {
       top_p: top_p,
       top_k: top_k,
       keywords: keyword,
-      sentence_length: "10",
-      sentence_count: "3"
+      sentence_length: sentenceLength
     }
     setState(true);
     _post(Data);
@@ -138,6 +138,34 @@ function Article_summarization(props) {
 
   const handleModel = (event) => {
     setModel(event.target.value);
+  };
+
+  const handleExample = (event) => {
+    const Data = {
+      textID: "ArticleSummarization",
+      index: event.target.value
+    }
+    setState(true);
+
+    if (event.target.value === 0) return;
+
+    const raw = JSON.stringify(Data);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': '*',
+      },
+      body: raw
+    };
+
+    fetch(`/api/get-example`, requestOptions)
+      .then(response =>response.json())
+      .then(json => setText(json['content'], setActualSummaries(json['summary'])))
+      .catch(error => setText(error));
+      unregister();
   };
   
   const handleChange = (event) => {
@@ -154,6 +182,10 @@ function Article_summarization(props) {
 
   function topkSlide(event, newValue) {
     setTopk(newValue);
+  }
+  
+  function sentenceLengthSlide(event, newValue) {
+    setSentenceLength(newValue);
   }
 
   return (
@@ -180,15 +212,33 @@ function Article_summarization(props) {
           </InputLabel>
           <Select
             native
+            onChange={handleExample}
             label="Example"
             inputProps={{
               name: 'examples',
               id: 'example selection',
             }}>
-            <option value="">None</option>
+            <option value={0}>없음</option>
+            <option value={1}>예시 1</option>
+            <option value={2}>예시 2</option>
+            <option value={3}>예시 3</option>
           </Select>
         </FormControl>
         <span>&nbsp;&nbsp;&nbsp;</span>
+        <FormControl variant="outlined" className={classes.formControl}>
+          <FormHelperText>문장길이 = {sentenceLength}</FormHelperText>
+          <Slider
+            className={classes.slide}
+            defaultValue={150}
+            aria-labelledby="discrete-slider-small-steps"
+            step={10}
+            marks
+            min={50}
+            max={250}
+            valueLabelDisplay="auto"
+            onChange={sentenceLengthSlide}
+          />
+        </FormControl>
       </Toolbar>
       <p></p>
       <Grid container spacing={2}  alignItems="center">
@@ -229,7 +279,7 @@ function Article_summarization(props) {
           </Paper>
           <p></p>
           <InputLabel shrink htmlFor="generation output">
-            결과
+            생성 결과
           </InputLabel>
           <Paper className={classes.paperPrimary}>
             <Toolbar>
@@ -237,6 +287,21 @@ function Article_summarization(props) {
                   <Grid container spacing={2}  alignItems="center">
                       <Typography color="textSecondary" align="center" display = 'block'>
                         {summaries}
+                      </Typography>
+                  </Grid>
+              </div>
+            </Toolbar>
+          </Paper>
+          <p></p>
+          <InputLabel shrink htmlFor="generation golden output">
+            실제 요약
+          </InputLabel>
+          <Paper className={classes.paperPrimary}>
+            <Toolbar>
+              <div className={classes.contentWrapper}>
+                  <Grid container spacing={2}  alignItems="center">
+                      <Typography color="textSecondary" align="center" display = 'block'>
+                        {actualSummaries}
                       </Typography>
                   </Grid>
               </div>

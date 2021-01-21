@@ -248,6 +248,27 @@ def chat_bot_api():
     return response
 
 
+def test():
+    connection = pymysql.connect(
+        host='localhost',
+        user='woongjin',
+        passwd='1029',
+        db='kogi',
+        charset='utf8'
+    )
+
+    try:
+        with connection.cursor() as cursor:
+            sql = 'SELECT * FROM summary where id =' + 1
+            cursor.execute(sql)
+            result = cursor.fetchall()
+    except:
+        return -1
+
+    print(result)
+    return 0
+
+
 if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available else "cpu")
     model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path="taeminlee/kogpt2")

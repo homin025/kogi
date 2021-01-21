@@ -1,7 +1,5 @@
-import React, {useState} from 'react';
-import {useAsync} from 'react-async';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -9,28 +7,28 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
-import HelpIcon from '@material-ui/icons/Help';
 import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import Slider from '@material-ui/core/Slider';
 import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import NativeSelect from '@material-ui/core/NativeSelect';
-import Switch from '@material-ui/core/Switch';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import CommentIcon from '@material-ui/icons/Comment';
-import clsx from 'clsx';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Select from '@material-ui/core/Select';
+import Switch from '@material-ui/core/Switch';
+import HelpIcon from '@material-ui/icons/Help';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import fetchIntercept from 'fetch-intercept';
+import FetchIntercept from 'fetch-intercept';
+
+import CommentIcon from '@material-ui/icons/Comment';
+
+// const apiURL = "http://localhost:9999";
 
 const styles = (theme) => ({
   paperPrimary: {
@@ -58,14 +56,14 @@ const styles = (theme) => ({
   contentWrapper: {
     margin: '40px 16px',
   },
-  slide:{
-    width : 200
+  slide: {
+    width: 200
   },
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
   },
-  rec:{
+  rec: {
     textAlign: 'center'
   },
   backdrop: {
@@ -74,50 +72,56 @@ const styles = (theme) => ({
   },
 });
 
-const apiURL = "http://localhost:8888";
-
 function Review_generation(props) {
   const { classes } = props;
-  let [model, setModel] = useState('korquad');
+  let [model, setModel] = useState('animation');
   let [Text, setText] = useState('');
   let [count, setCount] = useState(3);
-  let [temperature, setTemp] = useState(1.0);
+  let [temperature, setTemperature] = useState(1.0);
   let [top_p, setTopp] = useState(0.9);
-  let [top_k, setTopk] = useState(10);
-  let [recommend, setRec] = useState([
-      {word : '추천단어1', sentence : '추천문장1', pos : 0},
-      {word : '추천단어2', sentence : '추천문장2', pos : 1},
-      {word : '추천단어3', sentence : '추천문장3', pos : 2},
-    ]);
-  let [checked, setChecked] = React.useState(false);
+  let [top_k, setTopk] = useState(40);
+  let [recommend, setRecommend] = useState([
+    { word: '', sentence: '', pos: 0 },
+    { word: '', sentence: '', pos: 1 },
+    { word: '', sentence: '', pos: 2 }
+  ]);
+  let [checked, setChecked] = React.useState(true);
+  let [checkedAuto, setCheckedAuto] = React.useState(false);
   let [state, setState] = useState(false);
-  const unregister = fetchIntercept.register({
+
+  const unregister = FetchIntercept.register({
     request: function (url, config) {
-        setState(true);
-        return [url, config];
+      setState(true);
+      return [url, config];
     },
 
     requestError: function (error) {
       setState(false);
-        return Promise.reject(error);
+      return Promise.reject(error);
     },
 
     response: function (response) {
       setState(false);
-        return response;
+      return response;
     },
 
     responseError: function (error) {
       setState(false);
-        return Promise.reject(error);
+      return Promise.reject(error);
     }
-});
+  });
+
   const toggleChecked = () => {
     setChecked((prev) => !prev);
   };
 
+  const toggleAChecked = () => {
+    setCheckedAuto((prev) => !prev);
+  };
+
   function _post(Data) {
     const raw = JSON.stringify(Data);
+
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -127,223 +131,232 @@ function Review_generation(props) {
       },
       body: raw
     };
-    fetch(`${apiURL}/api/question-generation`, requestOptions)
-      .then(response => response.json())
-      .then(json => setRecommend(json['sentence'],json['words']))
-      .catch(error => setText(error));
 
+    fetch(`/api/review-generation`, requestOptions)
+      .then(response => response.json())
+      .then(json => setRecommendommend(json['sentence'], json['words']))
+      .catch(error => setText(error));
     unregister();
   }
 
-  function refresh(){
+  function refresh() {
     setText('');
   }
-  
+
   const handleChange = (event) => {
     setText(event.target.value);
   }
 
-  function handleRec(event,index){
-      (checked)?
-      setText(Text +' '+ recommend[index].sentence+' ')
+  function handleRecommend(event, index) {
+    (checked) ?
+      setText(Text + ' ' + recommend[index].sentence + ' ')
       :
-      setText(Text +' '+ recommend[index].word+' ')
+      setText(Text + ' ' + recommend[index].word + ' ')
   }
 
-  function handleClick(){
+  function handleClick() {
     const Data = {
-      textID: "FairytaleGeneration",
+      textID: "ReviewGeneration",
       content: Text,
       model: model,
       temperature: temperature,
       top_p: top_p,
       top_k: top_k,
       flag: checked,
-      count: count,
-      sentence_length: "10",
-      sentence_count: "3"
-      }
-      setState(true);
+      auto: checkedAuto,
+      count: count
+    }
+    setState(true);
     _post(Data);
   }
 
-  function tempSlide(event, newValue){
-    setTemp(newValue);
+  function tempSlide(event, newValue) {
+    setTemperature(newValue);
   }
 
-  function toppSlide(event, newValue){
+  function toppSlide(event, newValue) {
     setTopp(newValue);
   }
 
-  function topkSlide(event, newValue){
+  function topkSlide(event, newValue) {
     setTopk(newValue);
   }
 
   const handleModel = (event) => {
     setModel(event.target.value);
   };
-  async function handleCount(event){
+
+  async function handleCount(event) {
     setCount(event.target.value);
-    recCount(event.target.value);
+    recommendCount(event.target.value);
   };
-    function recCount(con) {
-      let temp = [];
-      for(let i = 0; i < con; i++){
-          temp = [...temp , {word : `추천단어${i+1}`, sentence:`추천문장${i+1}`, pos:i}];
-      }
-      setRec(temp);
-  }
-  function setRecommend(sentenceList,wordsList){
-    let temp = [];
-    for(let i = 0; i<count; i++){
-        temp = [...temp , {word : wordsList[i], sentence:sentenceList[i], pos:i}];
+
+  function recommendCount(condition) {
+    let arr = [];
+    for (let i = 0; i < condition; i++) {
+      arr = [...arr, { word: ``, sentence: ``, pos: i }];
     }
-    setRec(temp);
-}
+    setRecommend(arr);
+  }
+
+  function setRecommendommend(sentenceList, wordsList) {
+    let arr = [];
+    for (let i = 0; i < count; i++) {
+      arr = [...arr, { word: wordsList[i], sentence: sentenceList[i], pos: i }];
+    }
+    setRecommend(arr);
+  }
+
   return (
     <div>
       <Toolbar>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel shrink htmlFor="model selection">
-           모델
+            모델
           </InputLabel>
-          <NativeSelect
+          <Select
+            native
             onChange={handleModel}
+            label="Model"
             inputProps={{
-            name: 'models',
-            id: 'model selection',
-            }}
-          >
-            <option value="korquad">리뷰생성</option>
-          </NativeSelect>
-        {/* <FormHelperText>Label + placeholder</FormHelperText> */}
+              name: 'models',
+              id: 'model selection',
+            }}>
+            <option value="animation">애니메이션 영화</option>
+          </Select>
         </FormControl>
-        <FormControl className={classes.formControl}>
+        <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel shrink htmlFor="example selection">
-          예시
+            예시
           </InputLabel>
-          <NativeSelect
+          <Select
+            native
+            label="Example"
             inputProps={{
               name: 'examples',
               id: 'example selection',
-            }}
-          >
-          <option value="">None</option>
-         </NativeSelect>
-        {/* <FormHelperText>Label + placeholder</FormHelperText> */}
+            }}>
+            <option value={0}>None</option>
+            <option value={1}>1</option>
+            <option value={2}>2</option>
+            <option value={3}>3</option>
+          </Select>
         </FormControl>
-        <FormControl className={classes.formControl}>
-          <InputLabel shrink htmlFor="setCount">
-          생성예시 갯수
+        <FormControl variant="outlined" className={classes.formControl}>
+          <InputLabel shrink htmlFor="model selection">
+            생성예시 개수
           </InputLabel>
-          <NativeSelect
+          <Select
+            native
             onChange={handleCount}
+            label="Count"
             inputProps={{
-            name: 'recs',
-            id: 'recommned count',
-            }}
-          >
-          <option value={3}>3</option>
-          <option value={4}>4</option>
-          <option value={5}>5</option>
-          <option value={6}>6</option>
-          <option value={7}>7</option>
-         </NativeSelect>
-        {/* <FormHelperText>Label + placeholder</FormHelperText> */}
+              name: 'counts',
+              id: 'recommend count',
+            }}>
+            <option value={3}>3</option>
+            <option value={4}>4</option>
+            <option value={5}>5</option>
+            <option value={6}>6</option>
+            <option value={7}>7</option>
+          </Select>
         </FormControl>
         <FormControl className={classes.formControl}>
-        <FormControlLabel
-        control={<Switch checked={checked} onChange={toggleChecked} color="primary"/>}
-        label={checked ? '문장' : '단어'}
-        />
-        {/* <FormHelperText>Label + placeholder</FormHelperText> */}
+          <FormHelperText>추천형태</FormHelperText>
+          <FormControlLabel
+            control={<Switch checked={checked} onChange={toggleChecked} color="primary" />}
+            label={checked ? '문장' : '단어'}
+          />
+
         </FormControl>
-        </Toolbar>
-      
-        <Grid container spacing={2}  alignItems="center">
-        
+        <FormControl className={classes.formControl}>
+          <FormHelperText>자동생성</FormHelperText>
+          <FormControlLabel
+            control={<Switch checked={checkedAuto} onChange={toggleAChecked} color="primary" />}
+            label={checkedAuto ? 'ON' : 'OFF'}
+          />
+        </FormControl>
+      </Toolbar>
+
+      <Grid container spacing={2} alignItems="center">
         <Grid item xs={8}>
-        <InputLabel shrink htmlFor="context input">
+          <InputLabel shrink htmlFor="context input">
             본문
           </InputLabel>
           <Paper className={classes.paperPrimary}>
-            
-              <Toolbar>
-                <Grid container spacing={2}  alignItems="center">
+            <Toolbar>
+              <Grid container spacing={2} alignItems="center">
                 <Grid item xs>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={10}
-                      placeholder='기사를 입력해주세요'
-                      value={Text}
-                      onChange={handleChange}
-                      InputProps={{
-                        disableUnderline: true,
-                        className: classes.searchInput,
-                      }}
-                    />
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={10}
+                    placeholder='기사를 입력해주세요'
+                    value={Text}
+                    onChange={handleChange}
+                    InputProps={{
+                      disableUnderline: true,
+                      className: classes.searchInput,
+                    }}
+                  />
                 </Grid>
-
                 <Grid item>
-                    <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
-                      생성
+                  <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
+                    생성
                     </Button>
-                    <Tooltip title="Refresh">
-                      <IconButton onClick={refresh}>
-                        <RefreshIcon className={classes.block} color="inherit" />
-                      </IconButton>
-                    </Tooltip>
+                  <Tooltip title="Refresh">
+                    <IconButton onClick={refresh}>
+                      <RefreshIcon className={classes.block} color="inherit" />
+                    </IconButton>
+                  </Tooltip>
                 </Grid>
-
-                </Grid>
-              </Toolbar>
-              </Paper>
-              <p/>
-              <InputLabel shrink htmlFor="context input">
+              </Grid>
+            </Toolbar>
+          </Paper>
+          <p />
+          <InputLabel shrink htmlFor="context input">
             결과
           </InputLabel>
-              <Paper className={classes.paperPrimary}>
-            <div className={classes.contentWrapper}>
-                <List component="nav">
-                    <ListSubheader/>
-                        {recommend.map(({ word: Word, sentence: Sentence, pos : Pos}) => (
-                        <ListItem
-                        value = {checked ? Sentence : Word}
-                        button
-                        onClick = {(event) => handleRec(event, Pos)}
-                        index = {Pos}
-                        >
-                        <CommentIcon color = "disabled"/>
-                        &nbsp;
-                        <ListItemText
-
-                        align = 'left'
-                        >
-                          {checked ? Sentence : Word}
-                        </ListItemText>
-                        </ListItem>
-                    ))}
-                </List>
-            </div>
-            </Paper>
+          <Paper className={classes.paperPrimary}>
+            <Toolbar>
+              <List component="nav">
+                <ListSubheader />
+                {recommend.map(({ word: Word, sentence: Sentence, pos: Pos }) => (
+                  <ListItem
+                    value={checked ? Sentence : Word}
+                    button
+                    onClick={(event) => handleRecommend(event, Pos)}
+                    index={Pos}>
+                    <CommentIcon color="disabled" />
+                    &nbsp;
+                    <ListItemText
+                      align='left'
+                    >
+                      {checked ? Sentence : Word}
+                    </ListItemText>
+                    <p />
+                  </ListItem>
+                ))}
+              </List>
+            </Toolbar>
+          </Paper>
         </Grid>
         <Grid item xs>
-          <Paper className={classes.paperSecondary} align ='center'>
-                <Toolbar alignItems="center">
-                    <Grid item xs = {11}>
-                        <Typography id="temperature" gutterBottom>
-                            temperature : {temperature} 
-                        </Typography> 
-                    </Grid>
-                    <Grid item xs = {1}>
-                        <Tooltip title="생성되는 글의 창의성을 조절하는 값입니다.">
-                            <IconButton size = 'small' color="inherit">
-                                <HelpIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Toolbar>
+          <Paper className={classes.paperSecondary} align='center'>
+            <Toolbar alignItems="center">
+              <Grid item xs={11}>
+                <Typography id="temperature" gutterBottom>
+                  temperature : {temperature}
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <Tooltip title="생성되는 글의 창의성을 조절하는 값입니다.">
+                  <IconButton size='small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
               defaultValue={1.0}
@@ -353,23 +366,22 @@ function Review_generation(props) {
               min={0.5}
               max={2.0}
               valueLabelDisplay="auto"
-              onChange = {tempSlide}
+              onChange={tempSlide}
             />
             <Toolbar alignItems="center">
-                    <Grid item xs = {11}>
-                    <Typography id="top_p" gutterBottom>
-                    top_p : {top_p}
-                    </Typography> 
-                    </Grid>
-                    <Grid item xs = {1}>
-                        <Tooltip title="샘플링된 단어 중 top_p 확률 이상의 단어만 선택합니다.">
-                            <IconButton size = 'small' color="inherit">
-                                <HelpIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Toolbar>
-            
+              <Grid item xs={11}>
+                <Typography id="top_p" gutterBottom>
+                  top_p : {top_p}
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <Tooltip title="샘플링된 단어 중 top_p 확률 이상의 단어만 선택합니다.">
+                  <IconButton size='small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
               defaultValue={0.9}
@@ -379,22 +391,22 @@ function Review_generation(props) {
               min={0.5}
               max={1.0}
               valueLabelDisplay="auto"
-              onChange = {toppSlide}
+              onChange={toppSlide}
             />
             <Toolbar alignItems="center">
-                    <Grid item xs = {11}>
-                    <Typography id="top_k" gutterBottom>
-                      top_k : {top_k}
-                    </Typography> 
-                    </Grid>
-                    <Grid item xs = {1}>
-                        <Tooltip title="샘플링된 단어 중 상위 k개의 단어만 선택합니다.">
-                            <IconButton size = 'small' color="inherit">
-                                <HelpIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Toolbar>
+              <Grid item xs={11}>
+                <Typography id="top_k" gutterBottom>
+                  top_k : {top_k}
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <Tooltip title="샘플링된 단어 중 상위 k개의 단어만 선택합니다.">
+                  <IconButton size='small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
               defaultValue={10}
@@ -404,7 +416,7 @@ function Review_generation(props) {
               min={5}
               max={100}
               valueLabelDisplay="auto"
-              onChange = {topkSlide}
+              onChange={topkSlide}
             />
           </Paper>
         </Grid>
