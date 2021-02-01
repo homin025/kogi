@@ -136,7 +136,7 @@ function Tale_generation(props) {
     fetch(`/api/tale-generation`, requestOptions)
       .then(response => response.json())
       .then(json => {
-        recommendInput(json['sentence'], json['words'])
+        recommendInput(json['sentences'], json['words'])
         setTime(`${(new Date().getTime()-start.getTime())/1000}`)
         setSent(true);
       })

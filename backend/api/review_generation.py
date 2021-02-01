@@ -28,4 +28,4 @@ def main(content, model, tokenizer, device, model_file, temperature, top_k, top_
     # 단어추천 리스트 return
     else:
         words = sample_sequence_words(model, tokenizer, device, content, temperature, top_k, top_p, word_count)
-        return {'words': words, 'sentence': []}
+        return {'words': words, 'sentences': []}

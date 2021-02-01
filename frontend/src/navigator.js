@@ -19,6 +19,7 @@ import TimerIcon from '@material-ui/icons/Timer';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PhonelinkSetupIcon from '@material-ui/icons/PhonelinkSetup';
 import kogi from './kogi.png';
+
 const categories = [
   {
     id: '기능',
@@ -111,7 +112,6 @@ function Navigator(props) {
                 </ListItemText>
               </ListItem>
             ))}
-
             <Divider className={classes.divider} />
           </React.Fragment>
         ))}

@@ -26,7 +26,6 @@ def question_generation_api():
         top_p(float): top_p 값
 
         keywords(list): 키워드 리스트
-        sentence_length(int): 출력 문장 길이
 
     Output:
         questions(list): 생성된 질문 리스트
@@ -51,9 +50,8 @@ def question_generation_api():
         top_p = float(data['top_p'])
 
         keywords = data['keywords']
-        sentence_length = int(data['sentence_length'])
 
-        result = question_generation.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, keywords, sentence_length)
+        result = question_generation.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, keywords)
 
         response.set_data(json.dumps(result, ensure_ascii=False))
 
@@ -188,15 +186,9 @@ def review_generation_api():
         top_p = float(data['top_p'])
         recommend_flag = data['recommend_flag']
         auto_flag = data['auto_flag']
+        count = int(data['count'])
 
-        if recommend_flag:
-            sentence_count = int(data['sentence_count'])
-            word_count = 0
-        else:
-            word_count = int(data['word_count'])
-            sentence_count = 0
-
-        result = review_generation.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, recommend_flag, auto_flag, sentence_count, word_count)
+        result = review_generation.main(content, model, tokenizer, device, model_file, temperature, top_k, top_p, recommend_flag, auto_flag, count)
 
         response.set_data(json.dumps(result, ensure_ascii=False))
 

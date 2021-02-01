@@ -146,8 +146,7 @@ function Question_generation(props) {
       temperature: temperature,
       top_p: top_p,
       top_k: top_k,
-      keywords: keyword,
-      sentence_length: "10"
+      keywords: keyword
     }
     setState(true);
     _post(Data);

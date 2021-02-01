@@ -106,12 +106,12 @@ def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k,
             generated_token = tokenizer.id_to_token(prev)
 
             if generated_token == '.' or generated_token == '</s>':
-                generated_token = generated_token.replace('▁', ' ')
+                generated_token = generated_token.replace('▁', '')
                 generated_token = generated_token.replace('</s>', '')
                 generated_text[idx] += generated_token
                 break
             else:
-                generated_token = generated_token.replace('▁', ' ')
+                generated_token = generated_token.replace('▁', '')
                 generated_text[idx] += generated_token
 
     return generated_text
@@ -202,19 +202,19 @@ def sample_sequence_paragraph(model, tokenizer, device, text, temperature, top_k
         generated_token = tokenizer.id_to_token(prev)
 
         if generated_token == '</s>':
-            generated_token = generated_token.replace('▁', ' ')
+            generated_token = generated_token.replace('▁', '')
             generated_token = generated_token.replace('</s>', '')
             generated_text += generated_token
             generated_count += 1
         elif generated_token == '<s>':
-            generated_token = generated_token.replace('▁', ' ')
+            generated_token = generated_token.replace('▁', '')
             generated_token = generated_token.replace('<s>', '')
             generated_text += generated_token
         elif generated_token == '<unk>':
-            generated_token = generated_token.replace('▁', ' ')
+            generated_token = generated_token.replace('▁', '')
             generated_token = generated_token.replace('<unk>', '')
             generated_text += generated_token
         else:
-            generated_text += generated_token.replace('▁', ' ')
+            generated_text += generated_token.replace('▁', '')
 
     return generated_text
