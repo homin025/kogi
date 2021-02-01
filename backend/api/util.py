@@ -65,11 +65,15 @@ def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k,
 
     prev = torch.multinomial(log_probs, num_samples=sentence_count)
 
-    for item in prev.squeeze().tolist():
-        generated_ids.append([item])
-        item = tokenizer.id_to_token(item)
-        item = item.replace('▁', '', 1)
-        generated_text.append(item)
+    for generated_token in prev.squeeze().tolist():
+        generated_ids.append([generated_token])
+        generated_token = tokenizer.id_to_token(generated_token)
+        generated_token = generated_token.replace('<s>', '')
+        generated_token = generated_token.replace('</s>', '.')
+        generated_token = generated_token.replace('<sys>', '')
+        generated_token = generated_token.replace('<unk>', '')
+        generated_token = generated_token.replace('▁', ' ')
+        generated_text.append(generated_token)
 
     """ Get to the end of sentence with each first tokens """
     for idx in range(sentence_count):
@@ -105,13 +109,18 @@ def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k,
 
             generated_token = tokenizer.id_to_token(prev)
 
-            if generated_token == '.' or generated_token == '</s>':
+            if generated_token == '.'  or generated_token == '<s>' or generated_token == '</s>':
                 generated_token = generated_token.replace('▁', '')
+                generated_token = generated_token.replace('<s>', '')
                 generated_token = generated_token.replace('</s>', '')
                 generated_text[idx] += generated_token
                 break
+            elif generated_token == '<sys>' or generated_token == '<unk>':
+                generated_token = generated_token.replace('<sys>', ' ')
+                generated_token = generated_token.replace('<unk>', ' ')
+                generated_text[idx] += generated_token
             else:
-                generated_token = generated_token.replace('▁', '')
+                generated_token = generated_token.replace('▁', ' ')
                 generated_text[idx] += generated_token
 
     return generated_text
@@ -150,10 +159,10 @@ def sample_sequence_words(model, tokenizer, device, text, temperature, top_k, to
 
     prev = torch.multinomial(log_probs, num_samples=word_count)
 
-    for item in prev.squeeze().tolist():
-        item = tokenizer.id_to_token(item)
-        item = item.replace('▁', '', 1)
-        generated_words.append(item)
+    for generated_token in prev.squeeze().tolist():
+        generated_token = tokenizer.id_to_token(generated_token)
+        generated_token = generated_token.replace('▁', ' ')
+        generated_words.append(generated_token)
 
     return generated_words
 
@@ -202,19 +211,19 @@ def sample_sequence_paragraph(model, tokenizer, device, text, temperature, top_k
         generated_token = tokenizer.id_to_token(prev)
 
         if generated_token == '</s>':
-            generated_token = generated_token.replace('▁', '')
+            generated_token = generated_token.replace('▁', ' ')
             generated_token = generated_token.replace('</s>', '')
             generated_text += generated_token
             generated_count += 1
         elif generated_token == '<s>':
-            generated_token = generated_token.replace('▁', '')
+            generated_token = generated_token.replace('▁', ' ')
             generated_token = generated_token.replace('<s>', '')
             generated_text += generated_token
         elif generated_token == '<unk>':
-            generated_token = generated_token.replace('▁', '')
+            generated_token = generated_token.replace('▁', ' ')
             generated_token = generated_token.replace('<unk>', '')
             generated_text += generated_token
         else:
-            generated_text += generated_token.replace('▁', '')
+            generated_text += generated_token.replace('▁', ' ')
 
     return generated_text

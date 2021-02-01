@@ -85,7 +85,7 @@ function Tale_generation(props) {
     { word: '', sentence: '', pos: 1 },
     { word: '', sentence: '', pos: 2 }
   ]);
-  let [checked, setChecked] = React.useState(true);
+  let [checkedRecommend, setCheckedRecommend] = React.useState(true);
   let [checkedAuto, setCheckedAuto] = React.useState(false);
   let [state, setState] = useState(false);
   let [time, setTime] = useState();
@@ -113,11 +113,11 @@ function Tale_generation(props) {
     }
   });
 
-  const toggleChecked = () => {
-    setChecked((prev) => !prev);
+  const toggleRecommendChecked = () => {
+    setCheckedRecommend((prev) => !prev);
   };
 
-  const toggleAChecked = () => {
+  const toggleAutoChecked = () => {
     setCheckedAuto((prev) => !prev);
   };
 
@@ -132,19 +132,21 @@ function Tale_generation(props) {
       },
       body: raw
     };
+
     const start = new Date();
+
     fetch(`/api/tale-generation`, requestOptions)
-      .then(response => response.json())
-      .then(json => {
-        recommendInput(json['sentences'], json['words'])
-        setTime(`${(new Date().getTime()-start.getTime())/1000}`)
-        setSent(true);
-      })
-      .catch(error => {
-        setText(error);
-        setTime(`${(new Date().getTime()-start.getTime())/1000}`)
-        setSent(true);
-      });
+    .then(response => response.json())
+    .then(json => {
+      recommendInput(json['sentences'], json['words'])
+      setTime(`${(new Date().getTime()-start.getTime())/1000}`)
+      setSent(true);
+    })
+    .catch(error => {
+      setText(error);
+      setTime(`${(new Date().getTime()-start.getTime())/1000}`)
+      setSent(true);
+    });
     unregister();
   }
 
@@ -160,7 +162,6 @@ function Tale_generation(props) {
       index: event.target.value
     }
     
-
     if (event.target.value === 0) return;
     setState(true);
     const raw = JSON.stringify(Data);
@@ -187,10 +188,10 @@ function Tale_generation(props) {
   }
 
   function handleRecommend(event, index) {
-    (checked) ?
-      setText(Text + ' ' + recommend[index].sentence + ' ')
+    (checkedRecommend) ?
+      setText(Text + ' ' + recommend[index].sentence)
       :
-      setText(Text + ' ' + recommend[index].word + ' ')
+      setText(Text + ' ' + recommend[index].word)
   }
 
   function handleClick() {
@@ -201,8 +202,8 @@ function Tale_generation(props) {
       temperature: temperature,
       top_p: top_p,
       top_k: top_k,
-      flag: checked,
-      auto: checkedAuto,
+      recommend_flag: checkedRecommend,
+      auto_flag: checkedAuto,
       count: count
     }
     setState(true);
@@ -304,15 +305,15 @@ function Tale_generation(props) {
         <FormControl className={classes.formControl}>
           <FormHelperText>추천형태</FormHelperText>
           <FormControlLabel
-            control={<Switch checked={checked} onChange={toggleChecked} color="primary" />}
-            label={checked ? '문장' : '단어'}
+            control={<Switch checked={checkedRecommend} onChange={toggleRecommendChecked} color="primary" />}
+            label={checkedRecommend ? '문장' : '단어'}
           />
 
         </FormControl>
         <FormControl className={classes.formControl}>
           <FormHelperText>자동생성</FormHelperText>
           <FormControlLabel
-            control={<Switch checked={checkedAuto} onChange={toggleAChecked} color="primary" />}
+            control={<Switch checked={checkedAuto} onChange={toggleAutoChecked} color="primary" />}
             label={checkedAuto ? 'ON' : 'OFF'}
           />
         </FormControl>
@@ -348,7 +349,7 @@ function Tale_generation(props) {
               </Typography>
               <span>&nbsp;&nbsp;&nbsp;</span>
               <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
-                {checkedAuto ? '자동생성' : (checked ? '문장추천' : '단어추천')}
+                {checkedAuto ? '자동생성' : (checkedRecommend ? '문장추천' : '단어추천')}
               </Button>
               <Tooltip title="Refresh">
                 <IconButton onClick={refresh}>
@@ -368,7 +369,7 @@ function Tale_generation(props) {
                 <ListSubheader />
                 {recommend.map(({ word: Word, sentence: Sentence, pos: Pos }) => (
                   <ListItem
-                    value={checked ? Sentence : Word}
+                    value={checkedRecommend ? Sentence : Word}
                     button
                     onClick={(event) => handleRecommend(event, Pos)}
                     index={Pos}>
@@ -377,7 +378,7 @@ function Tale_generation(props) {
                     <ListItemText
                       align='left'
                     >
-                      {checked ? Sentence : Word}
+                      {checkedRecommend ? Sentence : Word}
                     </ListItemText>
                     <p />
                   </ListItem>

@@ -25,7 +25,7 @@ class RGConfig(Config):
     def __init__(self) -> None:
         super().__init__()
         self.model_dict = {
-            "animation": "./model/kogpt2_rg_naver_movie_20.ckpt"
+            "animation": "./model/kogpt2_rg_naver_23.ckpt"
         }
 
 
@@ -33,7 +33,7 @@ class TGConfig(Config):
     def __init__(self) -> None:
         super().__init__()
         self.model_dict = {
-            "woongjin": "./model/kogpt2_tg_woongjin_15.ckpt"
+            "woongjin": "./model/kogpt2_tg_woongjin_13.ckpt"
         }
 
 
