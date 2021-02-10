@@ -77,8 +77,8 @@ function Tale_generation(props) {
   let [model, setModel] = useState('woongjin');
   let [Text, setText] = useState('');
   let [count, setCount] = useState(3);
-  let [temperature, setTemperature] = useState(1.0);
-  let [top_p, setTopp] = useState(0.9);
+  let [temperature, setTemperature] = useState(1.3);
+  let [top_p, setTopp] = useState(1.0);
   let [top_k, setTopk] = useState(40);
   let [recommend, setRecommend] = useState([
     { word: '', sentence: '', pos: 0 },
@@ -405,7 +405,7 @@ function Tale_generation(props) {
             </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={1.0}
+              defaultValue={1.3}
               aria-labelledby="discrete-slider-small-steps"
               step={0.1}
               marks
@@ -430,7 +430,7 @@ function Tale_generation(props) {
             </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={0.9}
+              defaultValue={1.0}
               aria-labelledby="discrete-slider-small-steps"
               step={0.05}
               marks

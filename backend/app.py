@@ -330,10 +330,12 @@ def test_api():
 
 if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available else "cpu")
+
     model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path="taeminlee/kogpt2")
+
     tokenizer = SentencePieceBPETokenizer.from_file(
-        vocab_filename='./tokenizer/kogpt2_vocab.json',
-        merges_filename='./tokenizer/kogpt2_merges.txt',
+        vocab_filename='./tokenizer/tokenizers_vocab.json',
+        merges_filename='./tokenizer/tokenizers_merges.txt',
         add_prefix_space=False
     )
 

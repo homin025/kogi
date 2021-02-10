@@ -74,11 +74,11 @@ const styles = (theme) => ({
 
 function Review_generation(props) {
   const { classes } = props;
-  let [model, setModel] = useState('animation');
+  let [model, setModel] = useState('naver');
   let [Text, setText] = useState('');
   let [count, setCount] = useState(3);
-  let [temperature, setTemperature] = useState(1.0);
-  let [top_p, setTopp] = useState(0.9);
+  let [temperature, setTemperature] = useState(1.3);
+  let [top_p, setTopp] = useState(1.0);
   let [top_k, setTopk] = useState(40);
   let [recommend, setRecommend] = useState([
     { word: '', sentence: '', pos: 0 },
@@ -235,7 +235,9 @@ function Review_generation(props) {
               name: 'models',
               id: 'model selection',
             }}>
-            <option value="animation">애니메이션 영화</option>
+            <option value="naver">네이버 영화 리뷰</option>
+            <option value="ogeoseo_25">오거서 독후감 (Epoch 25)</option>
+            <option value="ogeoseo_50">오거서 독후감 (Epoch 50)</option>
           </Select>
         </FormControl>
         <FormControl variant="outlined" className={classes.formControl}>
@@ -377,7 +379,7 @@ function Review_generation(props) {
             </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={1.0}
+              defaultValue={1.3}
               aria-labelledby="discrete-slider-small-steps"
               step={0.1}
               marks
@@ -402,7 +404,7 @@ function Review_generation(props) {
             </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={0.9}
+              defaultValue={1.0}
               aria-labelledby="discrete-slider-small-steps"
               step={0.05}
               marks

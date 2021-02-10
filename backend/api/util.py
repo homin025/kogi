@@ -109,15 +109,17 @@ def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k,
 
             generated_token = tokenizer.id_to_token(prev)
 
-            if generated_token == '.'  or generated_token == '<s>' or generated_token == '</s>':
+            if generated_token == '.' or generated_token == '<s>' or generated_token == '</s>':
                 generated_token = generated_token.replace('▁', '')
                 generated_token = generated_token.replace('<s>', '')
                 generated_token = generated_token.replace('</s>', '')
                 generated_text[idx] += generated_token
                 break
-            elif generated_token == '<sys>' or generated_token == '<unk>':
-                generated_token = generated_token.replace('<sys>', ' ')
-                generated_token = generated_token.replace('<unk>', ' ')
+            elif generated_token == '<usr>'  or generated_token == '<pad>' or generated_token == '<sys>' or generated_token == '<unk>':
+                generated_token = generated_token.replace('<usr>', '')
+                generated_token = generated_token.replace('<pad>', '')
+                generated_token = generated_token.replace('<sys>', '')
+                generated_token = generated_token.replace('<unk>', '')
                 generated_text[idx] += generated_token
             else:
                 generated_token = generated_token.replace('▁', ' ')
@@ -162,6 +164,12 @@ def sample_sequence_words(model, tokenizer, device, text, temperature, top_k, to
     for generated_token in prev.squeeze().tolist():
         generated_token = tokenizer.id_to_token(generated_token)
         generated_token = generated_token.replace('▁', ' ')
+        generated_token = generated_token.replace('<s>', '')
+        generated_token = generated_token.replace('</s>', '')
+        generated_token = generated_token.replace('<usr>', '')
+        generated_token = generated_token.replace('<pad>', '')
+        generated_token = generated_token.replace('<sys>', '')
+        generated_token = generated_token.replace('<unk>', '')
         generated_words.append(generated_token)
 
     return generated_words
@@ -219,8 +227,10 @@ def sample_sequence_paragraph(model, tokenizer, device, text, temperature, top_k
             generated_token = generated_token.replace('▁', ' ')
             generated_token = generated_token.replace('<s>', '')
             generated_text += generated_token
-        elif generated_token == '<unk>':
-            generated_token = generated_token.replace('▁', ' ')
+        elif generated_token == '<usr>'  or generated_token == '<pad>' or generated_token == '<sys>' or generated_token == '<unk>':
+            generated_token = generated_token.replace('<usr>', '')
+            generated_token = generated_token.replace('<pad>', '')
+            generated_token = generated_token.replace('<sys>', '')
             generated_token = generated_token.replace('<unk>', '')
             generated_text += generated_token
         else:

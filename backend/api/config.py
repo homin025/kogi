@@ -25,7 +25,9 @@ class RGConfig(Config):
     def __init__(self) -> None:
         super().__init__()
         self.model_dict = {
-            "animation": "./model/kogpt2_rg_naver_23.ckpt"
+            "naver": "./model/kogpt2_rg_naver_23.ckpt",
+            "ogeoseo_25": "./model/kogpt2_rg_ogeoseo_25.ckpt",
+            "ogeoseo_50": "./model/kogpt2_rg_ogeoseo_50.ckpt"
         }
 
 

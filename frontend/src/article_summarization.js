@@ -68,8 +68,8 @@ function Article_summarization(props) {
   let [summaries, setSummaries] = useState('');
   let [actualSummaries, setActualSummaries] = useState('');
   let [sentenceLength, setSentenceLength] = useState(50);
-  let [temperature, setTemperature] = useState(1.0);
-  let [top_p, setTopp] = useState(0.9);
+  let [temperature, setTemperature] = useState(1.3);
+  let [top_p, setTopp] = useState(1.0);
   let [top_k, setTopk] = useState(40);
   let [state, setState] = useState(false);
   let [time, setTime] = useState();
@@ -346,7 +346,7 @@ function Article_summarization(props) {
             </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={1.0}
+              defaultValue={1.3}
               aria-labelledby="discrete-slider-small-steps"
               step={0.1}
               marks
@@ -371,7 +371,7 @@ function Article_summarization(props) {
             </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={0.9}
+              defaultValue={1.0}
               aria-labelledby="discrete-slider-small-steps"
               step={0.05}
               marks
