@@ -27,6 +27,7 @@ import clsx from 'clsx';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import fetchIntercept from 'fetch-intercept';
+
 const styles = (theme) => ({
   paperPrimary: {
     maxWidth: 3000,

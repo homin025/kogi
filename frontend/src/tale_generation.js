@@ -455,7 +455,7 @@ function Tale_generation(props) {
             </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={10}
+              defaultValue={40}
               aria-labelledby="discrete-slider-small-steps"
               step={5}
               marks
