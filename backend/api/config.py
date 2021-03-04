@@ -17,7 +17,9 @@ class ASConfig(Config):
     def __init__(self) -> None:
         super().__init__()
         self.model_dict = {
-            "korean": "./model/kogpt2_as_korean_50.ckpt"
+            "korean": "./model/kogpt2_as_korean_50.ckpt",
+            "dacon": "./model/kogpt2_as_dacon_100.ckpt",
+            "korean_dacon": "./model/kogpt2_as_korean_dacon_150.ckpt"
         }
 
 
@@ -25,9 +27,7 @@ class RGConfig(Config):
     def __init__(self) -> None:
         super().__init__()
         self.model_dict = {
-            "naver": "./model/kogpt2_rg_naver_23.ckpt",
-            "ogeoseo_25": "./model/kogpt2_rg_ogeoseo_25.ckpt",
-            "ogeoseo_50": "./model/kogpt2_rg_ogeoseo_50.ckpt"
+            "ogeoseo": "./model/kogpt2_rg_ogeoseo_100.ckpt"
         }
 
 

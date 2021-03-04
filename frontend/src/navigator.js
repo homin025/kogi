@@ -84,7 +84,6 @@ function Navigator(props) {
         <ListItem className={clsx(classes.firebase, classes.item, classes.itemCategory)}>
           <img src = {kogi} alt= ''/>
         </ListItem>
-
         {categories.map(({ id, children }) => (
           <React.Fragment key={id}>
             <ListItem className={classes.categoryHeader}>
@@ -100,14 +99,12 @@ function Navigator(props) {
               <ListItem
                 key={childId}
                 button
-                className={clsx(classes.item, active && classes.itemActiveItem)}
-              >
+                className={clsx(classes.item, active && classes.itemActiveItem)}>
                 <ListItemIcon className={classes.itemIcon}>{icon}</ListItemIcon>
                 <ListItemText
                   classes={{
                     primary: classes.itemPrimary,
-                  }}
-                >
+                  }}>
                   {childId}
                 </ListItemText>
               </ListItem>

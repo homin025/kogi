@@ -74,12 +74,12 @@ const styles = (theme) => ({
 
 function Review_generation(props) {
   const { classes } = props;
-  let [model, setModel] = useState('naver');
+  let [model, setModel] = useState('ogeoseo');
   let [Text, setText] = useState('');
   let [count, setCount] = useState(3);
   let [temperature, setTemperature] = useState(1.3);
   let [top_p, setTopp] = useState(1.0);
-  let [top_k, setTopk] = useState(40);
+  let [top_k, setTopk] = useState(50);
   let [recommend, setRecommend] = useState([
     { word: '', sentence: '', pos: 0 },
     { word: '', sentence: '', pos: 1 },
@@ -138,7 +138,11 @@ function Review_generation(props) {
     fetch(`/api/review-generation`, requestOptions)
     .then(response => response.json())
     .then(json => {
-      recommendInput(json['sentences'], json['words'])
+      if (checkedAuto === false) {
+        recommendInput(json['sentences'], json['words'])
+      } else {
+        setText(json['paragraph'])
+      }
       setTime(`${(new Date().getTime()-start.getTime())/1000}`)
       setSent(true);
     })
@@ -235,9 +239,7 @@ function Review_generation(props) {
               name: 'models',
               id: 'model selection',
             }}>
-            <option value="naver">네이버 영화 리뷰</option>
-            <option value="ogeoseo_25">오거서 독후감 (Epoch 25)</option>
-            <option value="ogeoseo_50">오거서 독후감 (Epoch 50)</option>
+            <option value="ogeoseo">오거서 독후감</option>
           </Select>
         </FormControl>
         <FormControl variant="outlined" className={classes.formControl}>

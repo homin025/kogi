@@ -17,19 +17,19 @@ app = Flask(__name__)
 
 @app.route('/api/question-generation', methods=['POST', 'OPTIONS'])
 def question_generation_api():
-    """ Question Generation API
+    """ Question Generation API related to Kogi
     Input:
-        content(str): 입력 내용
-        model(str): 모델명
-        temperature(float): 온도 값
-        top_k(int): top_k 값
-        top_p(float): top_p 값
+        content(str): Input text
+        model(str): Name of model
+        temperature(float): Temperature value
+        top_k(int): Top K value
+        top_p(float): Top P value
 
-        keywords(list): 키워드 리스트
+        keywords(list): List of keywords
 
     Output:
-        questions(list): 생성된 질문 리스트
-        answers(list): 생선된 질문의 정답 리스트
+        questions(list): List of generated questions
+        answers(list): List of answers for generated questions
     """
     response = Response()
 
@@ -60,18 +60,18 @@ def question_generation_api():
 
 @app.route('/api/article-summarization', methods=['POST', 'OPTIONS'])
 def article_summarization_api():
-    """ Article Summarization API
+    """ Article Summarization API related to Kogi
     Input:
-        content(str): 입력 내용
-        model(str): 모델명
-        temperature(float): 온도 값
-        top_k(int): top_k 값
-        top_p(float): top_p 값
+        content(str): Input text
+        model(str): Name of model
+        temperature(float): Temperature value
+        top_k(int): Top K value
+        top_p(float): Top P value
 
-        sentence_length(int): 출력 문장 길이
+        sentence_length(int): Length limit of generation
 
     Output:
-        summary(str): 생성된 요약 본문
+        summary(str): Generated summary
     """
     response = Response()
 
@@ -102,22 +102,22 @@ def article_summarization_api():
 
 @app.route('/api/tale-generation', methods=['POST', 'OPTIONS'])
 def tale_generation_api():
-    """ Tale Generation API
+    """ Tale Generation API related to Kogi
     Input:
-        content(str): 입력 내용
-        model(str): 모델명
-        temperature(float): 온도 값
-        top_k(int): top_k 값
-        top_p(float): top_p 값
+        content(str): Input text
+        model(str): Name of model
+        temperature(float): Temperature value
+        top_k(int): Top K value
+        top_p(float): Top P value
 
-        count(int): 출력 문장 / 단어 수
-        recommend_flag(bool): 문장추천(True) / 단어추천(False)
-        auto_flag(bool): 자동완성 ON(True) / OFF(False)
+        count(int): How many outputs to be provided
+        recommend_flag(bool): Text generation of [True for sentence / False for word]
+        auto_flag(bool): Auto generation if [True for on / False for off]
 
     Output:
-        sentences(str): 생성된 문장 리스트
-        words(list): 생성된 단어 리스트
-        paragraph(str): 자동완성된 문단
+        sentences(list): List of generated sentences
+        words(list): List of generated words
+        paragraph(str): Auto-generated paragraph
     """
     response = Response()
 
@@ -149,23 +149,22 @@ def tale_generation_api():
 
 @app.route('/api/review-generation', methods=['POST', 'OPTIONS'])
 def review_generation_api():
-    """ Review Generation API
+    """ Review Generation API related to Kogi
     Input:
-        content(str): 입력 내용
-        model(str): 모델명
-        temperature(float): 온도 값
-        top_k(int): top_k 값
-        top_p(float): top_p 값
+        content(str): Input text
+        model(str): Name of model
+        temperature(float): Temperature value
+        top_k(int): Top K value
+        top_p(float): Top P value
 
-        sentence_count(int): 출력 문장 수
-        word_count(int): 출력 단어 수
-        recommend_flag(bool): 문장추천(True) / 단어추천(False)
-        auto_flag(bool): 자동완성 ON(True) / OFF(False)
+        count(int): How many outputs to be provided
+        recommend_flag(bool): Text generation of [True for sentence / False for word]
+        auto_flag(bool): Auto generation if [True for on / False for off]
 
     Output:
-        sentence(str): 생성된 문장
-        words(list): 생성된 단어 리스트
-        paragraph(str): 자동완성된 문단
+        sentences(list): List of generated sentences
+        words(list): List of generated words
+        paragraph(str): Auto-generated paragraph
     """
     response = Response()
 
@@ -197,16 +196,16 @@ def review_generation_api():
 
 @app.route('/api/chat-bot', methods=['POST', 'OPTIONS'])
 def chat_bot_api():
-    """ Chat Bot API
+    """ Chat Bot API related to Kogi
     Input:
-        content(str): 입력 내용
-        model(str): 모델명
-        temperature(float): 온도 값
-        top_k(int): top_k 값
-        top_p(float): top_p 값
+        content(str): Input text
+        model(str): Name of model
+        temperature(float): Temperature value
+        top_k(int): Top K value
+        top_p(float): Top P value
 
     Output:
-        sentence(str): 생성된 문장
+        sentence(str): Generated sentence
     """
     response = Response()
 
@@ -234,18 +233,19 @@ def chat_bot_api():
 
 
 @app.route('/api/get-example', methods=['POST', 'OPTIONS'])
-def get_data_api():
-    """ Get Example API
+def get_example_api():
+    """ Get Example API related to Kogi
+    This API loads example from MySQL.
     Input:
-        testID(str): API 이름
-        index(int): 데이터 순서
+        testID(str): Name of API
+        index(int): Index of example
 
     Output:
-        content(str): 데이터 본문
-        질문생성 keyword(str): 데이터 키워드
-        기사요약 summary(str): 데이터 요약
-        리뷰생성
-        동화창작
+        content(str): Content of example
+        Question Generation -> keyword(str): Keywords
+        Article Summarization -> summary(str): Summary
+        Tale Generattion ->
+        Review Generation ->
     """
     response = Response()
 
@@ -317,6 +317,146 @@ def get_data_api():
     return response
 
 
+
+@app.route('/api/load-article')
+def load_article_api():
+    """ Load Article API related to Kogi
+    This API loads content of news article from url of Naver news.
+    Input:
+        content(str): Input url
+
+    Output:
+        body(str): Content of news
+        summary(str): Summary of news
+    """
+    response = Response()
+
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
+
+    elif request.method == 'POST':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+
+        data = request.get_json()
+
+        content = data['content']
+
+        result = article_summarization.load_article_from_url(content)
+
+        response.set_data(json.dumps(result, ensure_ascii=False))
+
+    return response
+
+
+@app.route('/api/save-post', methods=['POST', 'OPTIONS'])
+def save_post():
+    """ Save Post API related to Cornor of Book
+    Input:
+        id(str): ID of card
+        body(str): Content of card
+        img(int): Index of image
+
+    Output:
+        content(str): Content of example
+        Question Generation -> keyword(str): Keywords
+        Article Summarization -> summary(str): Summary
+        Tale Generattion ->
+        Review Generation ->
+    """
+    response = Response()
+
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
+
+    elif request.method == 'POST':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+
+        data = request.get_json()
+
+        _id = data['id']
+        _body = "'" + data['body'] + "'"
+        _img = "'" + data['img'] + "'"
+
+        sql = 'INSERT INTO list (body, img) VALUES(' + _body +', ' + _img + ')'
+
+        connection = pymysql.connect(
+            host='localhost',
+            user='woongjin',
+            passwd='1029',
+            db='cob',
+            charset='utf8'
+        )
+
+        result = None
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+                result = cursor.fetchall()
+                connection.commit()
+            print('inserting data into database succeeds')
+        except:
+            print('inserting data into database fails')
+
+    return response
+
+
+@app.route('/api/load-post', methods=['GET', 'OPTIONS'])
+def load_post():
+    """ Load Post API related to Cornor of Book
+    Input:
+        None
+
+    Output:
+        content(str): Content of example
+        Question Generation -> keyword(str): Keywords
+        Article Summarization -> summary(str): Summary
+        Tale Generattion ->
+        Review Generation ->
+    """
+    response = Response()
+
+    if request.method == 'OPTIONS':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "GET, POST")
+
+    elif request.method == 'GET':
+        response.headers.add("Access-Control-Allow-Origin", "*")
+
+        sql = 'INSERT INTO list (body, img) VALUES(' + _body +', ' + _img + ')'
+
+        connection = pymysql.connect(
+            host='localhost',
+            user='woongjin',
+            passwd='1029',
+            db='cob',
+            charset='utf8'
+        )
+
+        result = None
+        try:
+            with connection.cursor() as cursor:
+                sql = 'SELECT * FROM list order by list.date DESC;'
+                cursor.execute(sql)
+                result = cursor.fetchall()
+                connection.commit()
+            print('inserting data into database succeeds')
+        except:
+            print('inserting data into database fails')
+
+        cards = []
+        for card in result:
+            cards.append({'id': card[0], 'body': card[1], 'img': card[2], date: card[3].strftime('%d %b, %H:%M')})
+        
+        response.set_data(json.dumps({'cards': cards}))
+
+    return response
+
+
 @app.route('/api/test', methods=['GET', 'POST', 'OPTIONS'])
 def test_api():
     result = Response()
@@ -329,7 +469,7 @@ def test_api():
 
 
 if __name__ == '__main__':
-    device = torch.device("cuda" if torch.cuda.is_available else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available else "cpu")
 
     model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path="taeminlee/kogpt2")
 

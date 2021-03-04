@@ -79,7 +79,7 @@ function Tale_generation(props) {
   let [count, setCount] = useState(3);
   let [temperature, setTemperature] = useState(1.3);
   let [top_p, setTopp] = useState(1.0);
-  let [top_k, setTopk] = useState(40);
+  let [top_k, setTopk] = useState(50);
   let [recommend, setRecommend] = useState([
     { word: '', sentence: '', pos: 0 },
     { word: '', sentence: '', pos: 1 },
@@ -138,7 +138,11 @@ function Tale_generation(props) {
     fetch(`/api/tale-generation`, requestOptions)
     .then(response => response.json())
     .then(json => {
-      recommendInput(json['sentences'], json['words'])
+      if (checkedAuto === false) {
+        recommendInput(json['sentences'], json['words'])
+      } else {
+        setText(json['paragraph'])
+      }
       setTime(`${(new Date().getTime()-start.getTime())/1000}`)
       setSent(true);
     })

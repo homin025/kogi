@@ -19,8 +19,8 @@ def main(content, model, tokenizer, device, model_file, temperature, top_k, top_
 
     # 자동완성 문단 return
     if auto_flag:
-        paragraph = sample_sequence_paragraph(model, tokenizer, device, content, temperature, top_k, top_p)
-        return {'paragraph': [paragraph]}
+        paragraph = sample_sequence_paragraph(model, tokenizer, device, content, temperature, top_k, top_p, count)
+        return {'paragraph': paragraph}
     # 문장추천 텍스트 return
     elif recommend_flag:
         sentences = sample_sequence_sentence(model, tokenizer, device, content, temperature, top_k, top_p, count)

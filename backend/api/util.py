@@ -2,6 +2,10 @@ import torch
 import torch.nn.functional as F
 
 
+special_tokens = ['<s>', '</s>', '<usr>', '<pad>', '<sys>', '<unk>', ]
+special_characters = [' ', '.', '.', ',', '!', '?', '\'', '\"', '“', '”', '‘', '’', ' .', ' .', '..', '.,', '.!', '.?', '.\'', '.\"', '.“', '.”', '.‘', '.’', ]
+
+
 def top_k_logits(logits, k):
     if k == 0:
         return logits
@@ -30,9 +34,8 @@ def top_p_logits(logits, top_p=0.0, filter_value=-float('Inf')):
 def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k, top_p, sentence_count):
     context_tokens = tokenizer.encode(text).ids  # 받은 문장
 
-    generated_text = []
-
     generated_ids = []
+    generated_text = []
 
     bos_token = tokenizer.token_to_id("<s>")
     eos_token = tokenizer.token_to_id("</s>")
@@ -40,8 +43,8 @@ def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k,
     """ Get the first following N tokens """
     input_ids = [bos_token] + context_tokens
 
-    if len(input_ids) > 1024:
-        input_ids = input_ids[len(input_ids) - 1020:]
+    if len(input_ids) > 1000:
+        input_ids = input_ids[len(input_ids) - 1000:]
 
     input_ids = torch.tensor([input_ids]).cuda()
 
@@ -65,23 +68,23 @@ def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k,
 
     prev = torch.multinomial(log_probs, num_samples=sentence_count)
 
-    for generated_token in prev.squeeze().tolist():
-        generated_ids.append([generated_token])
-        generated_token = tokenizer.id_to_token(generated_token)
-        generated_token = generated_token.replace('<s>', '')
-        generated_token = generated_token.replace('</s>', '.')
-        generated_token = generated_token.replace('<sys>', '')
-        generated_token = generated_token.replace('<unk>', '')
-        generated_token = generated_token.replace('▁', ' ')
-        generated_text.append(generated_token)
+    for generated_id in prev.squeeze().tolist():
+        generated_ids.append([generated_id])
+        generated_token = tokenizer.id_to_token(generated_id)
+
+        if generated_token not in special_tokens:
+            generated_token = generated_token.replace('▁', ' ')
+            generated_text.append(generated_token)
+        else:
+            generated_text.append('')
 
     """ Get to the end of sentence with each first tokens """
     for idx in range(sentence_count):
         while True:
             input_ids = [bos_token] + context_tokens + generated_ids[idx]
 
-            if len(input_ids) > 1024:
-                input_ids = input_ids[len(input_ids) - 1020:]
+            if len(input_ids) > 1000:
+                input_ids = input_ids[len(input_ids) - 1000:]
 
             input_ids = torch.tensor([input_ids]).cuda()
 
@@ -109,19 +112,11 @@ def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k,
 
             generated_token = tokenizer.id_to_token(prev)
 
-            if generated_token == '.' or generated_token == '<s>' or generated_token == '</s>':
-                generated_token = generated_token.replace('▁', '')
-                generated_token = generated_token.replace('<s>', '')
+            if generated_token == '.' or generated_token == '</s>':
                 generated_token = generated_token.replace('</s>', '')
                 generated_text[idx] += generated_token
                 break
-            elif generated_token == '<usr>'  or generated_token == '<pad>' or generated_token == '<sys>' or generated_token == '<unk>':
-                generated_token = generated_token.replace('<usr>', '')
-                generated_token = generated_token.replace('<pad>', '')
-                generated_token = generated_token.replace('<sys>', '')
-                generated_token = generated_token.replace('<unk>', '')
-                generated_text[idx] += generated_token
-            else:
+            elif generated_token not in special_tokens:
                 generated_token = generated_token.replace('▁', ' ')
                 generated_text[idx] += generated_token
 
@@ -131,6 +126,7 @@ def sample_sequence_sentence(model, tokenizer, device, text, temperature, top_k,
 def sample_sequence_words(model, tokenizer, device, text, temperature, top_k, top_p, word_count):
     context_tokens = tokenizer.encode(text).ids  # 받은 문장
 
+    generated_ids = []
     generated_words = []
 
     bos_token = tokenizer.token_to_id("<s>")
@@ -138,7 +134,7 @@ def sample_sequence_words(model, tokenizer, device, text, temperature, top_k, to
 
     input_ids = [bos_token] + context_tokens
 
-    if len(input_ids) > 1024:
+    if len(input_ids) > 1000:
         input_ids = input_ids[len(input_ids) - 1000:]
 
     input_ids = torch.tensor([input_ids]).cuda()
@@ -161,21 +157,63 @@ def sample_sequence_words(model, tokenizer, device, text, temperature, top_k, to
 
     prev = torch.multinomial(log_probs, num_samples=word_count)
 
-    for generated_token in prev.squeeze().tolist():
-        generated_token = tokenizer.id_to_token(generated_token)
-        generated_token = generated_token.replace('▁', ' ')
-        generated_token = generated_token.replace('<s>', '')
-        generated_token = generated_token.replace('</s>', '')
-        generated_token = generated_token.replace('<usr>', '')
-        generated_token = generated_token.replace('<pad>', '')
-        generated_token = generated_token.replace('<sys>', '')
-        generated_token = generated_token.replace('<unk>', '')
+    for generated_id in prev.squeeze().tolist():
+        generated_ids.append([generated_id])
+        generated_token = tokenizer.id_to_token(generated_id)
+
+        if generated_token.strip('▁') not in special_tokens and generated_token.strip('▁') not in special_characters:
+            generated_token = generated_token.replace('▁', ' ')
+            generated_words.append(generated_token)
+        else:
+            generated_words.append('')
+
+    for idx in range(word_count):
+        if generated_words[idx] != '':
+            continue
+
+        while True:
+            input_ids = [bos_token] + context_tokens + generated_ids[idx]
+
+            if len(input_ids) > 1000:
+                input_ids = input_ids[len(input_ids) - 1000:]
+
+            input_ids = torch.tensor([input_ids]).cuda()
+
+            input_ids.to(device)
+
+            predicts = model(input_ids)
+            pred = predicts[0]
+
+            # temperature applying
+            logits = pred
+            logits = logits[:, -1, :] / temperature
+
+            # top k sampling
+            logits = top_k_logits(logits, top_k)
+
+            # top p sampling
+            logits = top_p_logits(logits, top_p)
+
+            # probabilities
+            log_probs = F.softmax(logits, dim=-1)
+
+            prev = torch.multinomial(log_probs, num_samples=1)
+
+            generated_ids[idx] += prev.tolist()[0]
+
+            generated_token = tokenizer.id_to_token(prev)
+
+            if generated_token.strip('▁') not in special_tokens and generated_token.strip('▁') not in special_characters:
+                generated_token = generated_token.replace('▁', ' ')
+                generated_words[idx] += generated_token
+                break
+
         generated_words.append(generated_token)
 
     return generated_words
 
 
-def sample_sequence_paragraph(model, tokenizer, device, text, temperature, top_k, top_p):
+def sample_sequence_paragraph(model, tokenizer, device, text, temperature, top_k, top_p, paragraph_count):
     context_tokens = tokenizer.encode(text).ids  # 받은 문장
 
     generated_text = ''
@@ -186,11 +224,11 @@ def sample_sequence_paragraph(model, tokenizer, device, text, temperature, top_k
     bos_token = tokenizer.token_to_id("<s>")
     eos_token = tokenizer.token_to_id("</s>")
 
-    while generated_count <= 3:
+    while generated_count <= paragraph_count:
         input_ids = [bos_token] + context_tokens + generated_id
 
-        if len(input_ids) > 1024:
-            input_ids = input_ids[len(input_ids) - 1020:]
+        if len(input_ids) > 1000:
+            input_ids = input_ids[len(input_ids) - 1000:]
 
         input_ids = torch.tensor([input_ids]).cuda()
 
@@ -218,22 +256,12 @@ def sample_sequence_paragraph(model, tokenizer, device, text, temperature, top_k
 
         generated_token = tokenizer.id_to_token(prev)
 
-        if generated_token == '</s>':
-            generated_token = generated_token.replace('▁', ' ')
+        if generated_token == '.' or generated_token == '</s>':
             generated_token = generated_token.replace('</s>', '')
             generated_text += generated_token
             generated_count += 1
-        elif generated_token == '<s>':
+        elif generated_token not in special_tokens:
             generated_token = generated_token.replace('▁', ' ')
-            generated_token = generated_token.replace('<s>', '')
             generated_text += generated_token
-        elif generated_token == '<usr>'  or generated_token == '<pad>' or generated_token == '<sys>' or generated_token == '<unk>':
-            generated_token = generated_token.replace('<usr>', '')
-            generated_token = generated_token.replace('<pad>', '')
-            generated_token = generated_token.replace('<sys>', '')
-            generated_token = generated_token.replace('<unk>', '')
-            generated_text += generated_token
-        else:
-            generated_text += generated_token.replace('▁', ' ')
 
-    return generated_text
+    return text + generated_text

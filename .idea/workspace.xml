@@ -21,8 +21,10 @@
   <component name="ChangeListManager">
     <list default="true" id="6ec55a1f-cdf2-44d0-b2fc-aa89486e524c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/article_summarization.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/article_summarization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/util.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/article_summarization.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/article_summarization.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/chat_bot.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/chat_bot.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/question_generation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/question_generation.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/review_generation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/review_generation.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/tale_generation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/tale_generation.js" afterDir="false" />

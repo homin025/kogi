@@ -67,13 +67,14 @@ function Article_summarization(props) {
   let [text, setText] = useState('');
   let [summaries, setSummaries] = useState('');
   let [actualSummaries, setActualSummaries] = useState('');
-  let [sentenceLength, setSentenceLength] = useState(50);
-  let [temperature, setTemperature] = useState(1.3);
+  let [sentenceLength, setSentenceLength] = useState(150);
+  let [temperature, setTemperature] = useState(1.0);
   let [top_p, setTopp] = useState(1.0);
-  let [top_k, setTopk] = useState(40);
+  let [top_k, setTopk] = useState(50);
   let [state, setState] = useState(false);
   let [time, setTime] = useState();
   let [sent, setSent] = useState(false);
+  let [title, setTitle] = useState('실제 요약')
 
   function _post(Data) {
     const raw = JSON.stringify(Data);
@@ -102,28 +103,58 @@ function Article_summarization(props) {
         setTime(`${(new Date().getTime()-start.getTime())/1000}`)
         setSent(true);
       });
-      unregister();
+    unregister();
+  }
+
+  function _post_url(Data) {
+    const raw = JSON.stringify(Data);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+      },
+      body: raw
+    };
+
+    const start = new Date();
+
+    fetch(`/api/article-url`, requestOptions)
+      .then(response => response.json())
+      .then(json => {
+        setText(json['body']);
+        setActualSummaries(json['summary']);
+        setTitle('네이버 요약')
+        setSent(true);
+      })
+      .catch(error => {
+        setText(error);
+        setSent(true);
+      });
+    unregister();
   }
   
   const unregister = FetchIntercept.register({
     request: function (url, config) {
-        setState(true);
-        return [url, config];
+      setState(true);
+      return [url, config];
     },
 
     requestError: function (error) {
       setState(false);
-        return Promise.reject(error);
+      return Promise.reject(error);
     },
 
     response: function (response) {
       setState(false);
-        return response;
+      return response;
     },
 
     responseError: function (error) {
       setState(false);
-        return Promise.reject(error);
+      return Promise.reject(error);
     }
   });
 
@@ -132,7 +163,7 @@ function Article_summarization(props) {
     setSummaries('');
     setActualSummaries('');
     setSent(false);
-
+    setTitle('실제 요약')
   }
 
   function handleClick() {
@@ -147,6 +178,15 @@ function Article_summarization(props) {
     }
     setState(true);
     _post(Data);
+  }
+
+  function handleClick_url() {
+    const Data = {
+        textID: "ArticleSummarization",
+        content: text
+    }
+    setState(true);
+    _post_url(Data);
   }
 
   const handleModel = (event) => {
@@ -178,7 +218,7 @@ function Article_summarization(props) {
       .then(response =>response.json())
       .then(json => setText(json['content'], setActualSummaries(json['summary'])))
       .catch(error => setText(error));
-      unregister();
+    unregister();
   };
   
   const handleChange = (event) => {
@@ -217,6 +257,8 @@ function Article_summarization(props) {
               id: 'model selection',
             }}>
             <option value="korean">국립국어원 말뭉치</option>
+            <option value="dacon">DACON 대회 데이터</option>
+            <option value="korean_dacon">국립국어원 말뭉치 + DACON 대회 데이터</option>
           </Select>
         </FormControl>
         <FormControl variant="outlined" className={classes.formControl}>
@@ -232,9 +274,9 @@ function Article_summarization(props) {
               id: 'example selection',
             }}>
             <option value={0}>없음</option>
-            <option value={1}>부동산 대책</option>
-            <option value={2}>가난으로 포기했던 공부</option>
-            <option value={3}>청춘 바친 전우</option>
+            <option value={1}>코로나 대응</option>
+            <option value={2}>부동산 대책</option>
+            <option value={3}>보성군 녹차 LA 간담회</option>
           </Select>
         </FormControl>
         <span>&nbsp;&nbsp;&nbsp;</span>
@@ -284,6 +326,9 @@ function Article_summarization(props) {
                 {sent ? `응답시간 : ${time}s` : ''}
               </Typography>
               <span>&nbsp;&nbsp;&nbsp;</span>
+              <Button onClick={handleClick_url} variant="contained" color="primary" className={classes.button}>
+                네이버뉴스 URL 불러오기
+              </Button>
               <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
                 요약생성
               </Button>
@@ -312,7 +357,7 @@ function Article_summarization(props) {
           </Paper>
           <Toolbar>
           <InputLabel shrink htmlFor="generation golden output">
-            실제 요약
+            {title}
           </InputLabel>
           </Toolbar>
           <Paper className={classes.paperPrimary}>

@@ -77,10 +77,11 @@ function Question_generation(props) {
   let [answer, setAnswer] = useState([]);
   let [temperature, setTemperature] = useState(1.3);
   let [top_p, setTopp] = useState(1.0);
-  let [top_k, setTopk] = useState(40);
+  let [top_k, setTopk] = useState(50);
   let [state, setState] = useState(false);
   let [time, setTime] = useState();
   let [sent, setSent] = useState(false);
+
   function _post(Data) {
     const raw = JSON.stringify(Data);
 
@@ -111,24 +112,23 @@ function Question_generation(props) {
 
   const unregister = FetchIntercept.register({
     request: function (url, config) {
-        setState(true);
-
-        return [url, config];
+      setState(true);
+      return [url, config];
     },
 
     requestError: function (error) {
       setState(false);
-        return Promise.reject(error);
+      return Promise.reject(error);
     },
 
     response: function (response) {
       setState(false);
-        return response;
+      return response;
     },
 
     responseError: function (error) {
       setState(false);
-        return Promise.reject(error);
+      return Promise.reject(error);
     }
   });
 

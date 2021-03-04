@@ -73,7 +73,7 @@ const styles = (theme) => ({
   },
 });
 
-const apiURL = "http://localhost:8888";
+// const apiURL = "http://localhost:8888";
 
 function Chat_bot(props) {
   const { classes } = props;
@@ -85,6 +85,7 @@ function Chat_bot(props) {
   let [top_p, setTopp] = useState(0.9);
   let [top_k, setTopk] = useState(10);
   let [state, setState] = useState(false);
+
   const unregister = fetchIntercept.register({
     request: function (url, config) {
         setState(true);
@@ -105,19 +106,9 @@ function Chat_bot(props) {
       setState(false);
         return Promise.reject(error);
     }
-});
-  function _post(text) {
-    unregister();
-    const Data = {
-      textID: "Chat-Bot",
-      content: text,
-      model: model,
-      temperature: temperature,
-      top_p: top_p,
-      top_k: top_k,
-      sentence_length: "10",
-      sentence_count: "3"
-    }
+  });
+
+  function _post(Data) {
     const raw = JSON.stringify(Data);
 
     const requestOptions = {
@@ -130,11 +121,22 @@ function Chat_bot(props) {
       body: raw
     };
 
-    fetch(`${apiURL}/api/question-generation`, requestOptions)
-      .then(response => response.json())
-      .then(json=>setResult(json['sentence']))
-      .catch(error => setText(error));
-  };
+    const start = new Date();
+
+    fetch(`/api/article-summarization`, requestOptions)
+      .then(response =>response.json())
+      .then(json => {
+        setSummaries(json['summary'])
+        setTime(`${(new Date().getTime()-start.getTime())/1000}`)
+        setSent(true);
+      })
+      .catch(error => {
+        setText(error);
+        setTime(`${(new Date().getTime()-start.getTime())/1000}`)
+        setSent(true);
+      });
+    unregister();
+  }
 
   function refresh(){
     setText('');
@@ -154,31 +156,32 @@ function Chat_bot(props) {
     setConverse(temp);
   };
 
-  function handleClick(){
+  function handleClick() {
     addChat(Text);
   };
 
-  function tempSlide(event, newValue){
-    setTemp(newValue);
-  };
+  function tempSlide(event, newValue) {
+    setTemperature(newValue);
+  }
 
-  function toppSlide(event, newValue){
+  function toppSlide(event, newValue) {
     setTopp(newValue);
-  };
+  }
 
-  function topkSlide(event, newValue){
+  function topkSlide(event, newValue) {
     setTopk(newValue);
-  };
+  }
 
   const handleModel = (event) => {
     setModel(event.target.value);
   };
 
   const keyHandler = (event)=>{
-    if(event.key === "Enter"){
+    if(event.key === "Enter") {
       addChat(Text);
     }
   };
+  
   return (
     <div>
       <Toolbar>
@@ -191,89 +194,89 @@ function Chat_bot(props) {
             inputProps={{
             name: 'models',
             id: 'model selection',
-            }}
-          >
+            }}>
             <option value="chatbot">챗봇모델</option>
           </NativeSelect>
-        {/* <FormHelperText>Label + placeholder</FormHelperText> */}
         </FormControl>
         <FormControl className={classes.formControl}>
           <InputLabel shrink htmlFor="example selection">
-          예시
+            예시
           </InputLabel>
           <NativeSelect
-          
             inputProps={{
               name: 'examples',
               id: 'example selection',
-            }}
-          >
-          <option value="">None</option>
+            }}>
+            <option value="">None</option>
          </NativeSelect>
-        {/* <FormHelperText>Label + placeholder</FormHelperText> */}
         </FormControl>
       </Toolbar>
-
       <Grid container spacing={2}  alignItems="center">
         <Grid item xs={8}>
           <Paper className={classes.paperPrimary}>
             <div className={classes.contentWrapper}>
               <List style={{height: '500px', border:'1px solid black', overflow: 'hidden'}}>
                 <ListSubheader/>
-              {converse.map(({ id: childId, toggle: user }) => (
-              <ListItem
-                value = {user}
-                key={childId}
-              >
-              <ListItemText
-                className={clsx((!user)&&classes.me, (user)&&classes.bot)}
-              >
-                {childId}
-              </ListItemText>
-              </ListItem>
-            ))}
+                {converse.map(({ id: childId, toggle: user }) => (
+                  <ListItem
+                    value = {user}
+                    key={childId}>
+                    <ListItemText
+                      className={clsx((!user)&&classes.me, (user)&&classes.bot)}>
+                      {childId}
+                    </ListItemText>
+                  </ListItem>
+                ))}
               </List>
             </div>
-              <Divider variant="middle" />
-            
-              <Toolbar>
-                <Grid container spacing={2}  alignItems="center">
-                  <Grid item xs>
-                    <TextField
-                      fullWidth
-                      placeholder='대화를 입력해주세요'
-                      value={Text}
-                      onKeyDown={keyHandler}
-                      onChange={handleChange}
-                      InputProps={{
-                        disableUnderline: true,
-                        className: classes.searchInput,
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid item>
-                    <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
-                      생성
-                    </Button>
-                    <Tooltip title="Refresh">
-                      <IconButton onClick={refresh}>
-                        <RefreshIcon className={classes.block} color="inherit" />
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
+            <Toolbar>
+              <Grid container spacing={2}  alignItems="center">
+                <Grid item xs>
+                  <TextField
+                    fullWidth
+                    placeholder='대화를 입력해주세요'
+                    value={Text}
+                    onKeyDown={keyHandler}
+                    onChange={handleChange}
+                    InputProps={{
+                      disableUnderline: true,
+                      className: classes.searchInput,
+                    }}/>
                 </Grid>
-              </Toolbar>
-            </Paper>
-          </Grid>
+                <Grid item>
+                  <Button onClick={handleClick} variant="contained" color="primary" className={classes.button}>
+                    생성
+                  </Button>
+                  <Tooltip title="Refresh">
+                    <IconButton onClick={refresh}>
+                      <RefreshIcon className={classes.block} color="inherit" />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              </Grid>
+            </Toolbar>
+          </Paper>
+        </Grid>
+
         <Grid item xs>
           <Paper className={classes.paperSecondary} align ='center'>
-            <Typography id="temperature" gutterBottom>
-              temperature : {temperature}
-            </Typography>
+            <Toolbar alignItems="center">
+              <Grid item xs = {11}>
+                <Typography id="temperature" gutterBottom>
+                    Temperature = {temperature}
+                </Typography> 
+              </Grid>
+              <Grid item xs = {1}>
+                <Tooltip title={<h2>생성되는 글의 창의성을 조절합니다</h2>}>
+                  <IconButton size = 'small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={1.0}
+              defaultValue={1.3}
               aria-labelledby="discrete-slider-small-steps"
               step={0.1}
               marks
@@ -282,12 +285,23 @@ function Chat_bot(props) {
               valueLabelDisplay="auto"
               onChange = {tempSlide}
             />
-            <Typography id="top_p" gutterBottom>
-              top_p : {top_p}
-            </Typography>
+            <Toolbar alignItems="center">
+              <Grid item xs = {11}>
+                <Typography id="top_p" gutterBottom>
+                  Top P = {top_p}
+                </Typography> 
+              </Grid>
+              <Grid item xs = {1}>
+                <Tooltip title={<h2>샘플링될 단어의 누적분포 합이 P보다 크지 않도록 제한합니다</h2>}>
+                  <IconButton size = 'small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={0.9}
+              defaultValue={1.0}
               aria-labelledby="discrete-slider-small-steps"
               step={0.05}
               marks
@@ -296,12 +310,23 @@ function Chat_bot(props) {
               valueLabelDisplay="auto"
               onChange = {toppSlide}
             />
-            <Typography id="top_k" gutterBottom>
-              top_k : {top_k}
-            </Typography>
+            <Toolbar alignItems="center">
+              <Grid item xs = {11}>
+                <Typography id="top_k" gutterBottom>
+                  Top K = {top_k}
+                </Typography> 
+              </Grid>
+              <Grid item xs = {1}>
+                <Tooltip title={<h2>샘플링될 단어의 갯수를 K개로 제한합니다</h2>}>
+                  <IconButton size = 'small' color="inherit">
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Toolbar>
             <Slider
               className={classes.slide}
-              defaultValue={10}
+              defaultValue={40}
               aria-labelledby="discrete-slider-small-steps"
               step={5}
               marks
