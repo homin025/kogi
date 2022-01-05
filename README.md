@@ -16,7 +16,7 @@ This repository is for testing KoGPT-2 with four different application.
 1. *Question Generation*,
 this application is to generate questions with a body of text and keywords. It generates questions which match each keywords as answer.
 
-2. *Article Summarization*
+2. *Article Summarization*,
 this application is to summarize aritcle. It generates a single line of summary.
 
 3. *Tale Generation*,
